@@ -18,6 +18,7 @@ func main() {
 
 	// Create routes
 	router.POST("/register", controllers.Register)
+	router.POST("/login", controllers.Login)
 
 	router.Run("localhost:8080")
 }
