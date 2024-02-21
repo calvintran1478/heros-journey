@@ -70,11 +70,34 @@ func Login(c *gin.Context) {
 	}
 
 	// Generate JWT for the user
-	token, err := utils.GenerateToken(user.Email)
+	token, err := utils.GenerateToken(user.ID)
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+// DELETE /deleteAccount
+func DeleteAccount(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	var err error
+
+	// Get user token
+	user_id, err := utils.ExtractTokenID(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Remove user from database
+	var user models.User
+	if err = db.Where("id = ?", user_id).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User record not found"})
+		return
+	}
+	db.Delete(&user)
+
+	c.Status(http.StatusOK)
 }

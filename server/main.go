@@ -2,23 +2,29 @@ package main
 
 import (
 	"heros-journey/server/controllers"
+	"heros-journey/server/middlewares"
 	"heros-journey/server/models"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	router := gin.Default()
+	// Connect to database
 	db := models.SetupModels()
 
-	// Provide db variable to controllers
-	router.Use(func(c *gin.Context) {
-		c.Set("db", db)
-		c.Next()
-	})
+	// Create routing groups and set up middlewares
+	router := gin.Default()
+	router.Use(middlewares.DatabaseMiddleware(db))
 
-	// Create routes
-	router.POST("/register", controllers.Register)
-	router.POST("/login", controllers.Login)
+	public := router.Group("/")
+
+	protected := router.Group("/u")
+	protected.Use(middlewares.JwtAuthMiddleware())
+
+	// Create endpoint routes
+	public.POST("/register", controllers.Register)
+	public.POST("/login", controllers.Login)
+
+	protected.DELETE("/deleteAccount", controllers.DeleteAccount)
 
 	router.Run("localhost:8080")
 }
