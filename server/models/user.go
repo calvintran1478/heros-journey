@@ -32,6 +32,10 @@ type LoginInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type ForgotPasswordInput struct {
+	Email string `json:"email" binding:"required"`
+}
+
 type ChangePasswordInput struct {
 	Password string `json:"password" binding:"required"`
 }

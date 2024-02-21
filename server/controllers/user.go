@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"heros-journey/server/models"
+	"strings"
 	"net/http"
 	"net/mail"
 	"gorm.io/gorm"
@@ -107,7 +108,51 @@ func DeleteAccount(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// PATCH /u/changePassword
+// POST /forgotPassword
+func ForgotPassword(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	var err error
+
+	// Validate input bindings
+	var input models.ForgotPasswordInput
+	if err = c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Search for user
+	var user models.User
+	if err = db.Where("email = ?", input.Email).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User email not found"})
+		return
+	}
+
+	// Generate JWT for the user
+	token, err := utils.GenerateToken(user.ID)
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	// Send email to reset password
+	subject := "Reset Password"
+
+	var body strings.Builder
+	body.WriteString("Hi, we have received a request to reset your password for your Hero's Journey account.")
+	body.WriteString(" To change your password please click on the link below.\n\n")
+	body.WriteString(token)	// Will later pass token through a verification link
+	body.WriteString("\n\nIf this was not you kindly ignore this message.\n\n")
+	body.WriteString("Regards,\nThe Hero's Journey Team")
+
+	if err = utils.SendEmail(input.Email, subject, body.String()); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+// PATCH /u/changePassword 
 func ChangePassword(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var err error

@@ -23,6 +23,7 @@ func main() {
 	// Create endpoint routes
 	public.POST("/register", controllers.Register)
 	public.POST("/login", controllers.Login)
+	public.POST("/forgotPassword", controllers.ForgotPassword)
 
 	protected.DELETE("/deleteAccount", controllers.DeleteAccount)
 	protected.PATCH("/changePassword", controllers.ChangePassword)
