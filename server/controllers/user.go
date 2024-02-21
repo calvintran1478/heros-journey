@@ -79,7 +79,7 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
-// DELETE /deleteAccount
+// DELETE /u/deleteAccount
 func DeleteAccount(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var err error
@@ -91,13 +91,18 @@ func DeleteAccount(c *gin.Context) {
 		return
 	}
 
-	// Remove user from database
+	// Search for user
 	var user models.User
 	if err = db.Where("id = ?", user_id).First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User record not found"})
 		return
 	}
-	db.Delete(&user)
+
+	// Remove user from database
+	if err = db.Delete(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
 	c.Status(http.StatusOK)
 }
