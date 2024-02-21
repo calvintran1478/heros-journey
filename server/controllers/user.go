@@ -101,3 +101,44 @@ func DeleteAccount(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 }
+
+// PATCH /u/changePassword
+func ChangePassword(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	var err error
+
+	// Validate input bindings
+	var input models.ChangePasswordInput
+	if err = c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Get user token
+	user_id, err := utils.ExtractTokenID(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Search for user
+	var user models.User
+	if err = db.Where("id = ?", user_id).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Check that the password is at least 8 characters
+	if len(input.Password) < 8 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password must contain at least 8 characters"})
+		return
+	}
+
+	// Update user password
+	if err = db.Model(&user).Update("password", input.Password).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusOK)
+}

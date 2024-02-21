@@ -25,6 +25,7 @@ func main() {
 	public.POST("/login", controllers.Login)
 
 	protected.DELETE("/deleteAccount", controllers.DeleteAccount)
+	protected.PATCH("/changePassword", controllers.ChangePassword)
 
 	router.Run("localhost:8080")
 }
