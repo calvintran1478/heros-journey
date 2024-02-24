@@ -22,20 +22,20 @@ func (user *User) BeforeCreate(db *gorm.DB) (err error) {
 	return nil
 }
 
-type RegisterInput struct {
+type RegisterUserInput struct {
 	Email string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
-type LoginInput struct {
+type LoginUserInput struct {
 	Email string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
-type ForgotPasswordInput struct {
+type SendResetPasswordEmailInput struct {
 	Email string `json:"email" binding:"required"`
 }
 
-type ChangePasswordInput struct {
+type ChangeUserPasswordInput struct {
 	Password string `json:"password" binding:"required"`
 }

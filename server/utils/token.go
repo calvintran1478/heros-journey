@@ -12,16 +12,16 @@ import (
 
 // Reference: https://seefnasrul.medium.com/create-your-first-go-rest-api-with-jwt-authentication-in-gin-framework-dbe5bda72817
 
-func GenerateToken(user_id uint) (string, error) {
-	token_lifespan, err := strconv.Atoi(os.Getenv("TOKEN_HOUR_LIFESPAN"))
+func GenerateToken(userID uint) (string, error) {
+	tokenLifespan, err := strconv.Atoi(os.Getenv("TOKEN_HOUR_LIFESPAN"))
 	if err != nil {
 		return "", err
 	}
 
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
-	claims["user_id"] = user_id
-	claims["exp"] = time.Now().Add(time.Hour * time.Duration(token_lifespan)).Unix()
+	claims["user_id"] = userID
+	claims["exp"] = time.Now().Add(time.Hour * time.Duration(tokenLifespan)).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	return token.SignedString([]byte(os.Getenv("API_SECRET")))

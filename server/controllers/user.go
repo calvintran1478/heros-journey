@@ -11,12 +11,12 @@ import (
 	"heros-journey/server/utils"
 )
 
-// POST /register
-func Register(c *gin.Context) {
+// POST /api/v1/users
+func RegisterUser(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	// Validate input bindings
-	var input models.RegisterInput
+	var input models.RegisterUserInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -44,13 +44,13 @@ func Register(c *gin.Context) {
 	c.Status(http.StatusCreated)
 }
 
-// POST /login
-func Login(c *gin.Context) {
+// POST /api/v1/users/login
+func LoginUser(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var err error
 
 	// Validate input bindings
-	var input models.LoginInput
+	var input models.LoginUserInput
 	if err = c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -80,13 +80,13 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
-// DELETE /u/deleteAccount
-func DeleteAccount(c *gin.Context) {
+// DELETE /api/v1/users
+func DeleteUserAccount(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var err error
 
 	// Get user token
-	user_id, err := utils.ExtractTokenID(c)
+	userID, err := utils.ExtractTokenID(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -94,7 +94,7 @@ func DeleteAccount(c *gin.Context) {
 
 	// Search for user
 	var user models.User
-	if err = db.Where("id = ?", user_id).First(&user).Error; err != nil {
+	if err = db.Where("id = ?", userID).First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User record not found"})
 		return
 	}
@@ -108,13 +108,13 @@ func DeleteAccount(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// POST /forgotPassword
-func ForgotPassword(c *gin.Context) {
+// POST /api/v1/users/reset-password-email
+func SendResetPasswordEmail(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var err error
 
 	// Validate input bindings
-	var input models.ForgotPasswordInput
+	var input models.SendResetPasswordEmailInput
 	if err = c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -152,20 +152,20 @@ func ForgotPassword(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// PATCH /u/changePassword 
-func ChangePassword(c *gin.Context) {
+// PATCH /api/v1/users/password
+func ChangeUserPassword(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var err error
 
 	// Validate input bindings
-	var input models.ChangePasswordInput
+	var input models.ChangeUserPasswordInput
 	if err = c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Get user token
-	user_id, err := utils.ExtractTokenID(c)
+	userID, err := utils.ExtractTokenID(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -173,7 +173,7 @@ func ChangePassword(c *gin.Context) {
 
 	// Search for user
 	var user models.User
-	if err = db.Where("id = ?", user_id).First(&user).Error; err != nil {
+	if err = db.Where("id = ?", userID).First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
