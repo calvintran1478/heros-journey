@@ -105,7 +105,7 @@ func DeleteUserAccount(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.Status(http.StatusNoContent)
 }
 
 // POST /api/v1/users/reset-password-email
