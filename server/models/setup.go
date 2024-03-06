@@ -27,8 +27,20 @@ func SetupModels() *gorm.DB {
 		panic("failed to connect to database")
 	}
 
+	// Create enum types
+	db.Exec("DROP TYPE IF EXISTS gender CASCADE;")
+	db.Exec("DROP TYPE IF EXISTS hair_colour CASCADE;")
+	db.Exec("DROP TYPE IF EXISTS skin_colour CASCADE;")
+	db.Exec("DROP TYPE IF EXISTS eye_colour CASCADE;")
+
+	db.Exec("CREATE TYPE gender AS ENUM('male', 'female');")
+	db.Exec("CREATE TYPE hair_colour AS ENUM('black', 'brown', 'blonde', 'white', 'gray');")
+	db.Exec("CREATE TYPE skin_colour AS ENUM('pale', 'tan', 'dark');")
+	db.Exec("CREATE TYPE eye_colour AS ENUM('black', 'blue', 'green', 'silver');")
+
 	// Migrate schemas
 	db.AutoMigrate(&User{})
+	db.AutoMigrate(&Character{})
 
 	return db
 }
