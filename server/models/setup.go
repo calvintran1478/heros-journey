@@ -41,6 +41,8 @@ func SetupModels() *gorm.DB {
 	// Migrate schemas
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Character{})
+	db.AutoMigrate(&Item{})
+	db.AutoMigrate(&Equipment{})
 
 	return db
 }
