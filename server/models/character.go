@@ -37,7 +37,7 @@ const (
 type Character struct {
 	// Character customization
 	Name string `json:"name" gorm:"primaryKey"`
-	UserID uint `json:"user_id" gorm:"not null"`
+	UserID uint `gorm:"not null"`
 	User User `json:"user" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;not null"`
 	Gender Gender `json:"gender" gorm:"type:gender;not null"`
 	HairColour HairColour `json:"hair_colour" gorm:"type:hair_colour;not null"`
@@ -60,17 +60,17 @@ type Character struct {
 	SkillPoints uint `json:"skill_points" gorm:"check:skill_points >= 0;not null"`
 
 	// Equipment
-	HelmetName string `json:"helmet_name"`
-	BodyArmorName string `json:"body_armor_name"`
-	LegArmorName string `json:"leg_armor_name"`
-	BootsName string `json:"boots_name"`
-	WeaponName string `json:"weapon_name"`
+	HelmetName string `json:"helmet"`
+	BodyArmorName string `json:"body_armor"`
+	LegArmorName string `json:"leg_armor"`
+	BootsName string `json:"boots"`
+	WeaponName string `json:"weapon"`
 
-	Helmet Armor `json:"helmet" gorm:"foreignKey:HelmetName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-	BodyArmor Armor `json:"body_armor" gorm:"foreignKey:BodyArmorName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-	LegArmor Armor `json:"leg_armor" gorm:"foreignKey:LegArmorName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-	Boots Armor `json:"boots" gorm:"foreignKey:BootsName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-	Weapon Weapon `json:"weapon" gorm:"foreignKey:WeaponName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	Helmet Armor `gorm:"foreignKey:HelmetName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	BodyArmor Armor `gorm:"foreignKey:BodyArmorName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	LegArmor Armor `gorm:"foreignKey:LegArmorName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	Boots Armor `gorm:"foreignKey:BootsName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	Weapon Weapon `gorm:"foreignKey:WeaponName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 
 	// Weapon proficiency
 	SwordProficiency uint `json:"sword_proficiency" gorm:"check:sword_proficiency >= 0;not null"`
