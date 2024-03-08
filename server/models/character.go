@@ -60,17 +60,17 @@ type Character struct {
 	SkillPoints uint `json:"skill_points" gorm:"check:skill_points >= 0;not null"`
 
 	// Equipment
-	HelmetID uint `json:"helmet_id"`
-	BodyArmorID uint `json:"body_armor_id"`
-	LegArmorID uint `json:"leg_armor_id"`
-	BootsID uint `json:"boots_id"`
-	WeaponID uint `json:"weapon_id"`
+	HelmetName string `json:"helmet_name"`
+	BodyArmorName string `json:"body_armor_name"`
+	LegArmorName string `json:"leg_armor_name"`
+	BootsName string `json:"boots_name"`
+	WeaponName string `json:"weapon_name"`
 
-	Helmet string `json:"helmet" gorm:"foreignKey:HelmetID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-	BodyArmor string `json:"body_armor" gorm:"foreignKey:BodyArmorID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-	LegArmor string `json:"leg_armor" gorm:"foreignKey:LegArmorID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-	Boots string `json:"boots" gorm:"foreignKey:BootsID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-	Weapon string `json:"weapon" gorm:"foreignKey:WeaponID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	Helmet Armor `json:"helmet" gorm:"foreignKey:HelmetName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	BodyArmor Armor `json:"body_armor" gorm:"foreignKey:BodyArmorName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	LegArmor Armor `json:"leg_armor" gorm:"foreignKey:LegArmorName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	Boots Armor `json:"boots" gorm:"foreignKey:BootsName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	Weapon Weapon `json:"weapon" gorm:"foreignKey:WeaponName;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 
 	// Weapon proficiency
 	SwordProficiency uint `json:"sword_proficiency" gorm:"check:sword_proficiency >= 0;not null"`
@@ -79,4 +79,13 @@ type Character struct {
 	DaggerProficiency uint `json:"dagger_proficiency" gorm:"check:dagger_proficiency >= 0;not null"`
 	StaffProficiency uint `json:"staff_proficiency" gorm:"check:staff_proficiency >= 0;not null"`
 	BowProficiency uint `json:"bow_proficiency" gorm:"check:bow_proficiency >= 0;not null"`
+}
+
+// Specifies whether a character owns a particular item, and if so, how many
+type Inventory struct {
+	CharacterName string `json:"character_name" gorm:"primaryKey"`
+	ItemName string `json:"item_name" gorm:"primaryKey"`
+	Character Character `gorm:"foreignKey:CharacterName;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Item Item `gorm:"foreignKey:ItemName;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Count uint `json:"count" gorm:"check:count >= 1;not null"`
 }

@@ -12,8 +12,7 @@ const (
 )
 
 type Weapon struct {
-	UserID uint `json:"user_id" gorm:"primaryKey"`
-	WeaponName string `json:"name" gorm:"primaryKey"`
-	Equipment Equipment `gorm:"foreignKey:UserID,WeaponName;references:UserID,EquipmentName;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	WeaponName string `json:"weapon_name" gorm:"primaryKey"`
+	Equipment Equipment `gorm:"foreignKey:WeaponName;references:EquipmentName;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	WeaponType WeaponType `json:"weapon_type" gorm:"type:weapon_type;not null"`
 }

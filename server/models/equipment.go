@@ -2,9 +2,8 @@ package models
 
 type Equipment struct {
 	// Equipment properties
-	UserID uint `json:"user_id" gorm:"primaryKey"`
-	EquipmentName string `json:"name" gorm:"primaryKey"`
-	Item Item `gorm:"ForeignKey:UserID,EquipmentName;References:UserID,ItemName;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	EquipmentName string `json:"equipment_name" gorm:"primaryKey"`
+	Item Item `gorm:"foreignKey:EquipmentName;references:ItemName;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	RequiredLevel uint `json:"required_level" gorm:"check:required_level >= 1;not null"`
 
 	// Stat changes

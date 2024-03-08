@@ -46,6 +46,7 @@ func SetupModels() *gorm.DB {
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Character{})
 	db.AutoMigrate(&Item{})
+	db.AutoMigrate(&Inventory{})
 	db.AutoMigrate(&Equipment{})
 	db.AutoMigrate(&Weapon{})
 	db.AutoMigrate(&Armor{})
