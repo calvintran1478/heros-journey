@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { defaultStyles, buttonStyles } from '../styles/style';
+import "../styles/styles.css";
 
 export class CharacterCreation extends LitElement {
     @state()
@@ -11,7 +12,7 @@ export class CharacterCreation extends LitElement {
 
     private handleSubmit() {
         // TODO;
-    }
+    };
 
     @property()
     character_name: string = "";

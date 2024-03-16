@@ -5,7 +5,7 @@ export const defaultStyles = css`
     * {
         font-family: 'solwayregular';
     }
-`
+`;
 
 export const buttonStyles = css`
     button {

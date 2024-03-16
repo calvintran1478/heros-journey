@@ -1,0 +1,10 @@
+html {
+    height: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.character-creation {
+    background-image: url("../assets/images/backgrounds/character_creation_background.jpg");
+}
