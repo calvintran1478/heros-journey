@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit';
-import { state } from 'lit/decorators.js';
+import { state, property } from 'lit/decorators.js';
 import left_selector from '../assets/images/components/left_selector.png'
 import right_selector from '../assets/images/components/right_selector.png'
 import { defaultStyles } from '../styles/style';
@@ -7,7 +7,13 @@ import { defaultStyles } from '../styles/style';
 export class IterableSelector<T> extends LitElement {
     @state()
     private index: number = 0;
+
+    @property()
     private readonly options: T[] = [];
+
+    get curr() {
+        return this.options[this.index];
+    }
 
     private next() {
         this.index += 1;

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@vaadin/router": "^1.7.5",
+    "axios": "^1.6.8",
     "lit": "^3.1.2"
   },
   "devDependencies": {
