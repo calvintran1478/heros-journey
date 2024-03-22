@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { query } from 'lit/decorators.js';
 import { IterableSelector } from '../components/iterable-selector';
+import { NotificationBox } from '../components/notification-box';
 import { defaultStyles, buttonStyles } from '../styles/style';
 import axios from 'axios';
 import "../styles/styles.css";
@@ -25,13 +26,16 @@ export class CharacterCreation extends LitElement {
     @query("#eye-colour")
     private _eye_colour!: IterableSelector<string>
 
+    @query("notification-box")
+    private _notification_box!: NotificationBox
+
     private handleCharacterName(event: Event) {
         const input = event.target as HTMLInputElement;
         this.character_name = input.value;
     }
 
     private handleGoBack() {
-        // TODO: Route back to character selection
+        location.pathname = "character-selection";
     }
 
     private handleSubmit() {
@@ -46,15 +50,19 @@ export class CharacterCreation extends LitElement {
                 Authorization: `Bearer ${this.token}`
             }
         })
-        .then(res => {
-            if (res.status === 201) {
-                // TODO: Route back to characer selection
-            } else {
-                // TODO: Display error message to user
+        .then(response => {
+            console.log(response.status)
+            if (response.status === 201) {
+                this._notification_box.message = "Character successfully created!";
+                this._notification_box.action = () => location.pathname = "character-selection";
+                this._notification_box.display = true;
             }
         })
         .catch(error => {
-            console.log(error);
+            if (error.response.status === 409) {
+                this._notification_box.message = "Character with the given name already exists";
+                this._notification_box.display = true;
+            }
         });
     };
 
@@ -120,6 +128,7 @@ export class CharacterCreation extends LitElement {
                     </div>
                 </form>
             </div>
+            <notification-box></notification-box>
         `;
     }
 }
