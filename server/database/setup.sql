@@ -22,6 +22,6 @@ BEGIN
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'armor_type') THEN
-        CREATE TYPE weapon_type AS ENUM('helmet', 'body_armor', 'leg_armor', 'boots');
+        CREATE TYPE armor_type AS ENUM('helmet', 'body_armor', 'leg_armor', 'boots');
     END IF;
 END$$;
