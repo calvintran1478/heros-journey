@@ -18,4 +18,7 @@ func AddUserRoutes(rg *gin.RouterGroup) {
 	protected.Use(middleware.JwtAuthMiddleware())
 	protected.DELETE("", controllers.DeleteUserAccount)
 	protected.PATCH("/password", controllers.ChangeUserPassword)
+
+	// Protected character endpoints
+	AddCharacterRoutes(protected)
 }
