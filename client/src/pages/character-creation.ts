@@ -2,6 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { query } from 'lit/decorators.js';
 import { IterableSelector } from '../components/iterable-selector';
 import { NotificationBox } from '../components/notification-box';
+import { CharacterDisplay } from '../components/character-display';
 import { defaultStyles, buttonStyles } from '../styles/style';
 import axios from 'axios';
 import "../styles/styles.css";
@@ -28,6 +29,24 @@ export class CharacterCreation extends LitElement {
 
     @query("notification-box")
     private _notification_box!: NotificationBox
+
+    @query("character-display")
+    private _character_display!: CharacterDisplay
+
+    protected firstUpdated() {
+        this._gender.update_action = () => {
+            this._character_display.gender = this._gender.curr.toLowerCase();
+        }
+        this._hair_colour.update_action = () => {
+            this._character_display.hair_colour = this._hair_colour.curr.toLowerCase();
+        }
+        this._skin_colour.update_action = () => {
+            this._character_display.skin_colour = this._skin_colour.curr.toLowerCase();
+        }
+        this._eye_colour.update_action = () => {
+            this._character_display.eye_colour = this._eye_colour.curr.toLowerCase();
+        }
+    }
 
     private handleCharacterName(event: Event) {
         const input = event.target as HTMLInputElement;
@@ -74,9 +93,15 @@ export class CharacterCreation extends LitElement {
             width: 28em;
             background-color: white;
             border-style: solid;
-            border-color: #3b6593;
+            border-color: var(--steel-blue);
             border-width: 1em;
             border-radius: 1.5em;
+        }
+
+        character-display {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
         }
 
         div, form {
@@ -111,6 +136,7 @@ export class CharacterCreation extends LitElement {
                 <div style="align-items: center;">
                     <h1>Character Creation</h1>
                 </div>
+                <character-display></character-display>
                 <form class="selection">
                     <h2>Character Name</h2>
                     <input type="textBox" @input=${this.handleCharacterName} required/>
@@ -123,8 +149,8 @@ export class CharacterCreation extends LitElement {
                     <h2>Eye Colour</h2>
                     <iterable-selector id="eye-colour" .options=${this.eye_colour}></iterable-selector>
                     <div style="flex-direction: row;">
-                        <button style="background-color: #cacaca" type="button" @click=${this.handleGoBack}>Go back</button>
-                        <button style="background-color: #b0eda0" type="button" @click=${this.handleSubmit}>Confirm</button>
+                        <button style="background-color: var(--dark-gray)" type="button" @click=${this.handleGoBack}>Go back</button>
+                        <button style="background-color: var(--light-green)" type="button" @click=${this.handleSubmit}>Confirm</button>
                     </div>
                 </form>
             </div>

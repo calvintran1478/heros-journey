@@ -27,6 +27,12 @@ export class IterableSelector<T> extends LitElement {
         }
     }
 
+    public update_action: () => void = function() { return };
+
+    updated() {
+        this.update_action();
+    }
+
     static styles = [
         defaultStyles,
         css`

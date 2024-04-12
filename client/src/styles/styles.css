@@ -1,3 +1,10 @@
+/* Variables */
+:root {
+    --steel-blue: #3b6593;
+    --light-green: #b0eda0;
+    --dark-gray: #cacaca;
+}
+
 html {
     height: 100%;
     background-position: center center;
