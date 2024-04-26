@@ -73,3 +73,25 @@ func CreateCharacter(c *gin.Context) {
 
 	c.Status(http.StatusCreated)
 }
+
+// GET /api/v1/users/characters
+func GetCharacters(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	var err error
+
+	// Get user token
+	userID, err := utils.ExtractTokenID(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Get user characters
+	var characters []models.CharacterFeatures
+	if err = db.Table("characters").Select("slot_number", "name", "gender", "hair_colour", "skin_colour", "eye_colour").Where("user_id = ?", userID).Find(&characters).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"characters": characters})
+}

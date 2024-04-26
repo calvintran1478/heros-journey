@@ -101,3 +101,12 @@ type CreateCharacterInput struct {
 	SkinColour SkinColour `json:"skin_colour" binding:"required"`
 	EyeColour EyeColour `json:"eye_colour" binding:"required"`
 }
+
+type CharacterFeatures struct {
+	SlotNumber int `json:"slot_number"`
+	Name string `json:"character_name"`
+	Gender Gender `json:"gender"`
+	HairColour HairColour `json:"hair_colour"`
+	SkinColour SkinColour `json:"skin_colour"`
+	EyeColour EyeColour `json:"eye_colour"`
+}
