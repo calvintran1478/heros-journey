@@ -36,11 +36,11 @@ const (
 
 type Character struct {
 	// Slot number
-	SlotNumber int `json:"slot_number" gorm:"check:1 <= slot_number and slot_number <= 5;not null"`
+	SlotNumber int `json:"slot_number" gorm:"check:1 <= slot_number and slot_number <= 5;not null;uniqueIndex:user_slot_idx"`
 
 	// Character customization
 	Name string `json:"name" gorm:"primaryKey"`
-	UserID uint `gorm:"not null"`
+	UserID uint `gorm:"not null;uniqueIndex:user_slot_idx"`
 	User User `json:"user" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;not null"`
 	Gender Gender `json:"gender" gorm:"type:gender;not null"`
 	HairColour HairColour `json:"hair_colour" gorm:"type:hair_colour;not null"`
