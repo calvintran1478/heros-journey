@@ -27,8 +27,20 @@ func CreateCharacter(c *gin.Context) {
 		return
 	}
 
-	// Check that the given character name does not already exist
+	// Check that the slot number is valid
+	if input.SlotNumber < 1 || input.SlotNumber > 5 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Slot number must be an integer between 1 and 5 inclusive"})
+		return
+	}
+
+	// Check that the slot is available
 	var character_search models.Character
+	if err = db.Where("user_id = ? AND slot_number = ?", userID, input.SlotNumber).First(&character_search).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Character at given slot number already exists"})
+		return
+	}
+
+	// Check that the given character name does not already exist
 	if err = db.Where("name = ?", input.CharacterName).First(&character_search).Error; err == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "Character with given name already exists"})
 		return
@@ -36,6 +48,7 @@ func CreateCharacter(c *gin.Context) {
 
 	// Create character for the user
 	character := models.Character{
+		SlotNumber: input.SlotNumber,
 		Name: input.CharacterName,
 		UserID: userID,
 		Gender: input.Gender,
