@@ -28,6 +28,13 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	// Check if a user with the email already exists
+	var user models.User
+	if err := db.Where("email = ?", input.Email).First(&user).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "User with provided email already exists"})
+		return
+	}
+
 	// Check that the password is at least 8 characters
 	if len(input.Password) < 8 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Password must contain at least 8 characters"})
@@ -35,9 +42,9 @@ func RegisterUser(c *gin.Context) {
 	}
 
 	// Register user into the database
-	user := models.User{Email: input.Email, Password: input.Password}
+	user = models.User{Email: input.Email, Password: input.Password}
 	if err := db.Create(&user).Error; err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "User with provided email already exists"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
