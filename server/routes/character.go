@@ -9,4 +9,5 @@ func AddCharacterRoutes(rg *gin.RouterGroup) {
 	characters := rg.Group("/characters")
 	characters.POST("", controllers.CreateCharacter)
 	characters.GET("", controllers.GetCharacters)
+	characters.DELETE(":character-name", controllers.DeleteCharacter)
 }

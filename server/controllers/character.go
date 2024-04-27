@@ -95,3 +95,34 @@ func GetCharacters(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"characters": characters})
 }
+
+// DELETE /api/v1/users/characters/{character-name}
+func DeleteCharacter(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	var err error
+
+	// Get user token
+	userID, err := utils.ExtractTokenID(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Get path parameters
+	characterName := c.Param("character-name")
+
+	// Check if character exists
+	var character models.Character
+	if err = db.Where("user_id = ? AND name = ?", userID, characterName).First(&character).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Character not found"})
+		return
+	}
+
+	// Delete character
+	if err = db.Delete(&character).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}
