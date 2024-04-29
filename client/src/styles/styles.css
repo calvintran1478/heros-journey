@@ -3,6 +3,7 @@
     --steel-blue: #3b6593;
     --light-green: #b0eda0;
     --dark-gray: #cacaca;
+    --selection-highlight: #c1f0ff;
 }
 
 html {
@@ -14,4 +15,8 @@ html {
 
 .character-creation {
     background-image: url("../assets/images/backgrounds/character_creation_background.jpg");
+}
+
+.character-selection {
+    background-image: url("../assets/images/backgrounds/character_selection_background.jpg");
 }

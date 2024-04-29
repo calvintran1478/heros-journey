@@ -18,6 +18,15 @@ export class CharacterDisplay extends LitElement {
     @property()
     width: number = 25;
 
+    constructor(gender: string, hair_colour: string, skin_colour: string, eye_colour: string, width: number = 25) {
+        super();
+        this.gender = gender;
+        this.hair_colour = hair_colour;
+        this.skin_colour = skin_colour;
+        this.eye_colour = eye_colour;
+        this.width = width;
+    }
+
     // Temporary placeholder style until character artwork is created
     static styles = css`
         div {
