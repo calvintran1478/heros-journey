@@ -71,7 +71,6 @@ export class CharacterCreation extends LitElement {
             }
         })
         .then(response => {
-            console.log(response.status)
             if (response.status === 201) {
                 this._notification_box.message = "Character successfully created!";
                 this._notification_box.action = () => location.pathname = "character-selection";

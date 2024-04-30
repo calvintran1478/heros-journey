@@ -7,7 +7,6 @@ import axios from "axios";
 
 export class CharacterSelection extends LitElement {
 
-    private characters = Array(5).fill(null)
     private readonly token = ""
 
     // Positional offsets of slots from horizontal center and bottom of the page
@@ -34,20 +33,20 @@ export class CharacterSelection extends LitElement {
         })
         .then(response => {
             if (response.status === 200) {
+                const characters = Array(5).fill(null)
                 for (const character of response.data.characters) {
-                    this.characters[character.slot_number] = character;
+                    characters[character.slot_number] = character;
                 }
 
                 // Store character information in each selection slot
                 for (const [index, selection_slot] of this._slots.entries()) {
-                    if (this.characters[index] !== null) {
-                        console.log(this.characters[index].character_name);
-                        selection_slot.character_name = this.characters[index].character_name;
+                    if (characters[index] !== null) {
+                        selection_slot.character_name = characters[index].character_name;
                         selection_slot.character = new CharacterDisplay(
-                            this.characters[index].gender,
-                            this.characters[index].hair_colour,
-                            this.characters[index].skin_colour,
-                            this.characters[index].eye_colour,
+                            characters[index].gender,
+                            characters[index].hair_colour,
+                            characters[index].skin_colour,
+                            characters[index].eye_colour,
                             12
                         );
                     }
