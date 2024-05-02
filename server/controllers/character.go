@@ -56,7 +56,9 @@ func CreateCharacter(c *gin.Context) {
 		SkinColour: input.SkinColour,
 		EyeColour: input.EyeColour,
 		Gold: 20,
+		MaxHealth: 100,
 		Health: 100,
+		MaxMana: 80,
 		Mana: 80,
 		Attack: 40,
 		Defense: 40,
@@ -88,12 +90,44 @@ func GetCharacters(c *gin.Context) {
 
 	// Get user characters
 	var characters []models.CharacterFeatures
-	if err = db.Table("characters").Select("slot_number", "name", "gender", "hair_colour", "skin_colour", "eye_colour").Where("user_id = ?", userID).Find(&characters).Error; err != nil {
+	if err = db.Table("characters").Where("user_id = ?", userID).Find(&characters).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"characters": characters})
+}
+
+// GET /api/v1/users/characters/{character-name}
+func GetCharacter(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	var err error
+
+	// Get user token
+	userID, err := utils.ExtractTokenID(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Get path parameters
+	characterName := c.Param("character-name")
+
+	// Check if character exists
+	var character models.Character
+	if err = db.Where("user_id = ? AND name = ?", userID, characterName).First(&character).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Character not found"})
+		return
+	}
+
+	// Get character
+	var characterDetails models.CharacterDetails
+	if err = db.Table("characters").Where("name = ?", characterName).First(&characterDetails).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, characterDetails)
 }
 
 // DELETE /api/v1/users/characters/{character-name}

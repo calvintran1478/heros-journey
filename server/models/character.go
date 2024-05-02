@@ -51,8 +51,10 @@ type Character struct {
 	Level uint `json:"level" gorm:"check:level >= 1;default:1;not null"`
 	Experience float32 `json:"experience" gorm:"check:experience >= 0;default:0;not null"`
 	Gold uint `json:"gold" gorm:"check:gold >= 0;default:0;not null"`
-	Health uint `json:"health" gorm:"check:health >= 0;not null"`
-	Mana uint `json:"mana" gorm:"check:mana >= 0;not null"`
+	MaxHealth uint `json:"max_health" gorm:"check:max_health >= 0;not null"`
+	Health uint `json:"health" gorm:"check:0 <= health and health <= max_health;not null"`
+	MaxMana uint `json:"max_mana" gorm:"check:max_mana >= 0;not null"`
+	Mana uint `json:"mana" gorm:"check:0 <= mana and mana <= max_mana;not null"`
 	Attack uint `json:"attack" gorm:"check:attack >= 0;not null"`
 	Defense uint `json:"defense" gorm:"check:defense >= 0;not null"`
 	Intelligence uint `json:"intelligence" gorm:"check:intelligence >= 0;not null"`
@@ -109,4 +111,33 @@ type CharacterFeatures struct {
 	HairColour HairColour `json:"hair_colour"`
 	SkinColour SkinColour `json:"skin_colour"`
 	EyeColour EyeColour `json:"eye_colour"`
+}
+
+type CharacterDetails struct {
+	Name string `json:"character_name"`
+	Gender Gender `json:"gender"`
+	HairColour HairColour `json:"hair_colour"`
+	SkinColour SkinColour `json:"skin_colour"`
+	EyeColour EyeColour `json:"eye_colour"`
+	Level uint `json:"level"`
+	Experience float32 `json:"experience"`
+	Gold uint `json:"gold"`
+	MaxHealth uint `json:"max_health"`
+	Health uint `json:"health"`
+	MaxMana uint `json:"max_mana"`
+	Mana uint `json:"mana"`
+	Attack uint `json:"attack"`
+	Defense uint `json:"defense"`
+	Intelligence uint `json:"intelligence"`
+	Speed uint `json:"speed"`
+	Luck uint `json:"luck"`
+	Dexterity uint `json:"dexterity"`
+	AbilityPoints uint `json:"ability_points"`
+	SkillPoints uint `json:"skill_points"`
+	SwordProficiency uint `json:"sword_proficiency"`
+	AxeProficiency uint `json:"axe_proficiency"`
+	SpearProficiency uint `json:"spear_proficiency"`
+	DaggerProficiency uint `json:"dagger_proficiency"`
+	StaffProficiency uint `json:"staff_proficiency"`
+	BowProficiency uint `json:"bow_proficiency"`
 }
