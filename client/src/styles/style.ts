@@ -8,6 +8,10 @@ export const defaultStyles = css`
 `;
 
 export const buttonStyles = css`
+    button:disabled {
+        cursor: default;
+    }
+
     button {
         margin: 2em;
         cursor: pointer;

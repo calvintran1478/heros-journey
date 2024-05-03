@@ -2,7 +2,7 @@ import { LitElement, html, css } from "lit";
 import { property } from "lit/decorators.js";
 import { buttonStyles } from "../styles/style";
 
-export class NotificationBox extends LitElement {
+export class ConfirmationBox extends LitElement {
     @property()
     public message: string = "";
 
@@ -11,8 +11,12 @@ export class NotificationBox extends LitElement {
 
     public action: () => void = function() { return };
 
-    private handleButton() {
+    private handleConfirm() {
         this.action();
+        this.display = false;
+    }
+
+    private handleCancel() {
         this.display = false;
     }
 
@@ -63,7 +67,10 @@ export class NotificationBox extends LitElement {
             <div style="display:${this.display? 'flex' : 'none'}" class="page">
                 <div class="box">
                     <p>${this.message}</p>
-                    <button type="button" @click=${this.handleButton}>Okay</button>
+                    <div style="display: flex; flex-direction: row;">
+                        <button type="button" @click=${this.handleCancel}>No</button>
+                        <button type="button" @click=${this.handleConfirm}>Yes</button>
+                    </div>
                 </div>
             </div>
         `;

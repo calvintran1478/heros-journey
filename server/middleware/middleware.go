@@ -16,8 +16,8 @@ func DatabaseMiddleware(db *gorm.DB) gin.HandlerFunc {
 
 func JwtAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		err := utils.TokenValid(c)
-		if err != nil {
+		accessToken := utils.ExtractBearerToken(c)
+		if !utils.TokenValid(accessToken) {
 			c.String(http.StatusUnauthorized, "Unauthorized")
 			c.Abort()
 			return

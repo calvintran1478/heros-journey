@@ -11,6 +11,14 @@ export const routes: Route[] = [
                     await import('../pages/character-creation');
                     document.getElementById("html")!.className = "character-creation";
                 }
+            },
+            {
+                path: 'character-selection',
+                component: 'character-selection',
+                action: async () => {
+                    await import('../pages/character-selection');
+                    document.getElementById("html")!.className = "character-selection"
+                }
             }
         ]
     }
