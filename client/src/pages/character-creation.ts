@@ -59,6 +59,7 @@ export class CharacterCreation extends LitElement {
 
     private handleSubmit() {
         axios.post("http://localhost:8080/api/v1/users/characters", {
+            slot_number: parseInt(sessionStorage.getItem("slot_number")!),
             character_name: this.character_name,
             gender: this._gender.curr.toLowerCase(),
             hair_colour: this._hair_colour.curr.toLowerCase(),
@@ -70,7 +71,6 @@ export class CharacterCreation extends LitElement {
             }
         })
         .then(response => {
-            console.log(response.status)
             if (response.status === 201) {
                 this._notification_box.message = "Character successfully created!";
                 this._notification_box.action = () => location.pathname = "character-selection";

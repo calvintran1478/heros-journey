@@ -28,6 +28,13 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	// Check if a user with the email already exists
+	var user models.User
+	if err := db.Where("email = ?", input.Email).First(&user).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "User with provided email already exists"})
+		return
+	}
+
 	// Check that the password is at least 8 characters
 	if len(input.Password) < 8 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Password must contain at least 8 characters"})
@@ -35,9 +42,9 @@ func RegisterUser(c *gin.Context) {
 	}
 
 	// Register user into the database
-	user := models.User{Email: input.Email, Password: input.Password}
+	user = models.User{Email: input.Email, Password: input.Password}
 	if err := db.Create(&user).Error; err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "User with provided email already exists"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -71,13 +78,55 @@ func LoginUser(c *gin.Context) {
 	}
 
 	// Generate JWT for the user
-	token, err := utils.GenerateToken(user.ID)
+	accessToken, err := utils.GenerateAccessToken(user.ID)
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	refreshToken, err := utils.GenerateRefreshToken(user.ID)
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	// Add httponly cookie to response, which contains the refresh token
+	c.SetCookie("refresh-token", refreshToken, -1, "/", "localhost", false, true)
+
+	c.JSON(http.StatusOK, gin.H{"token": accessToken})
+}
+
+// GET /api/v1/users/token
+func RefreshToken(c *gin.Context) {
+
+	// Check if refresh token is present
+	tokenString, err := c.Cookie("refresh-token")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Refresh token required"})
+		return
+	}
+
+	// Check if the refresh token is expired or invalid
+	token, err := utils.ParseToken(tokenString)
+	if err != nil {
+		c.Status(http.StatusUnauthorized)
+		return
+	}
+
+	// Generate new access token for the user
+	userID, err := utils.ExtractUserID(token)
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	accessToken, err := utils.GenerateAccessToken(userID)
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": accessToken})
 }
 
 // DELETE /api/v1/users
@@ -128,7 +177,7 @@ func SendResetPasswordEmail(c *gin.Context) {
 	}
 
 	// Generate JWT for the user
-	token, err := utils.GenerateToken(user.ID)
+	token, err := utils.GenerateAccessToken(user.ID)
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		return

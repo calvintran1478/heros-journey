@@ -11,6 +11,7 @@ func AddUserRoutes(rg *gin.RouterGroup) {
 	public := rg.Group("/users")
 	public.POST("", controllers.RegisterUser)
 	public.POST("/login", controllers.LoginUser)
+	public.GET("/token", controllers.RefreshToken)
 	public.POST("/reset-password-email", controllers.SendResetPasswordEmail)
 
 	// Protected user endpoints
