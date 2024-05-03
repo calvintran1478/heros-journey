@@ -8,9 +8,6 @@ export class SelectionSlot extends LitElement {
     public character: CharacterDisplay | null = null;
 
     @property()
-    public character_name: string = "";
-
-    @property()
     public selected: boolean = false;
     
     public click_action: () => void = function() { return; };

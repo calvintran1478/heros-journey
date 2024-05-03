@@ -4,6 +4,9 @@ import { property } from "lit/decorators.js";
 export class CharacterDisplay extends LitElement {
 
     @property()
+    character_name: string = "";
+
+    @property()
     gender: string = "";
 
     @property()
@@ -18,8 +21,32 @@ export class CharacterDisplay extends LitElement {
     @property()
     width: number = 25;
 
-    constructor(gender: string, hair_colour: string, skin_colour: string, eye_colour: string, width: number = 25) {
+    // Character stats
+    level: number = 0;
+    experience: number = 0;
+    gold: number = 0;
+    max_health: number = 0;
+    health: number = 0;
+    max_mana: number = 0;
+    mana: number = 0;
+    attack: number = 0;
+    defense: number = 0;
+    intelligence: number = 0;
+    speed: number = 0;
+    luck: number = 0;
+    dexterity: number = 0;
+    ability_points: number = 0;
+    skill_points: number = 0;
+    sword_proficiency: number = 0;
+    axe_proficiency: number = 0;
+    spear_proficiency: number = 0;
+    dagger_proficiency: number = 0;
+    staff_proficiency: number = 0;
+    bow_proficiency: number = 0;
+
+    constructor(character_name: string, gender: string, hair_colour: string, skin_colour: string, eye_colour: string, width: number = 25) {
         super();
+        this.character_name = character_name;
         this.gender = gender;
         this.hair_colour = hair_colour;
         this.skin_colour = skin_colour;
