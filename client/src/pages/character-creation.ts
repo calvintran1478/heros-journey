@@ -1,18 +1,19 @@
-import { LitElement, html, css } from 'lit';
+import { html, css } from 'lit';
 import { query } from 'lit/decorators.js';
 import { IterableSelector } from '../components/iterable-selector';
 import { NotificationBox } from '../components/notification-box';
 import { CharacterDisplay } from '../components/character-display';
 import { defaultStyles, buttonStyles } from '../styles/style';
+import { ProtectedPage } from './protected-page';
 import axios from 'axios';
 import "../styles/styles.css";
 
-export class CharacterCreation extends LitElement {
+export class CharacterCreation extends ProtectedPage {
     private readonly genders = ["Male", "Female"];
     private readonly hair_colour = ["Black", "Brown", "Blonde", "White", "Gray"];
     private readonly skin_colour = ["Pale", "Tan", "Dark"];
     private readonly eye_colour = ["Black", "Blue", "Green", "Silver"];
-    private readonly token = ""; // TODO: Get from character selection page
+
     protected character_name: string = "";
 
     @query("#gender")
@@ -33,7 +34,7 @@ export class CharacterCreation extends LitElement {
     @query("character-display")
     private _character_display!: CharacterDisplay
 
-    protected firstUpdated() {
+    protected async firstUpdated() {
         this._gender.update_action = () => {
             this._character_display.gender = this._gender.curr.toLowerCase();
         }
@@ -46,6 +47,8 @@ export class CharacterCreation extends LitElement {
         this._eye_colour.update_action = () => {
             this._character_display.eye_colour = this._eye_colour.curr.toLowerCase();
         }
+
+        await super.firstUpdated();
     }
 
     private handleCharacterName(event: Event) {
@@ -77,8 +80,12 @@ export class CharacterCreation extends LitElement {
                 this._notification_box.display = true;
             }
         })
-        .catch(error => {
-            if (error.response.status === 409) {
+        .catch(async error => {
+            if (error.response.status === 401) {
+                await this.refreshToken();
+                this.handleSubmit();
+            }
+            else if (error.response.status === 409) {
                 this._notification_box.message = "Character with the given name already exists";
                 this._notification_box.display = true;
             }
@@ -155,6 +162,7 @@ export class CharacterCreation extends LitElement {
                 </form>
             </div>
             <notification-box></notification-box>
+            ${this.auth_template}
         `;
     }
 }

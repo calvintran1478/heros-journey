@@ -2,13 +2,15 @@ package controllers
 
 import (
 	"heros-journey/server/models"
+	"heros-journey/server/utils"
+	"os"
+	"strconv"
 	"strings"
 	"net/http"
 	"net/mail"
 	"gorm.io/gorm"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"heros-journey/server/utils"
 )
 
 // POST /api/v1/users
@@ -91,7 +93,13 @@ func LoginUser(c *gin.Context) {
 	}
 
 	// Add httponly cookie to response, which contains the refresh token
-	c.SetCookie("refresh-token", refreshToken, -1, "/", "localhost", false, true)
+	tokenLifespan, err := strconv.Atoi(os.Getenv("REFRESH_TOKEN_HOUR_LIFESPAN"))
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.SetSameSite(http.SameSiteStrictMode)
+	c.SetCookie("refresh-token", refreshToken, tokenLifespan * 3600, "/", "localhost", false, true)
 
 	c.JSON(http.StatusOK, gin.H{"token": accessToken})
 }

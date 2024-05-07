@@ -5,6 +5,22 @@ export const routes: Route[] = [
         path: '/',
         children: [
             {
+                path: '',
+                component: 'landing-page',
+                action: async () => {
+                    await import('../pages/landing-page');
+                    document.getElementById("html")!.className = "landing-page";
+                }
+            },
+            {
+                path: 'login',
+                component: 'login-page',
+                action: async () => {
+                    await import('../pages/login-page');
+                    document.getElementById("html")!.className = "landing-page";
+                }
+            },
+            {
                 path: 'character-creation',
                 component: 'character-creation',
                 action: async () => {

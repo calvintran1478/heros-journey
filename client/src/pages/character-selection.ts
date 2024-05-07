@@ -1,14 +1,13 @@
-import { LitElement, html, css } from "lit"
+import { html, css } from "lit"
 import { state, query, queryAll } from 'lit/decorators.js';
 import { ConfirmationBox } from "../components/confirmation-box";
 import { SelectionSlot } from "../components/selection-slot";
 import { CharacterDisplay } from "../components/character-display";
 import { defaultStyles, buttonStyles } from "../styles/style";
+import { ProtectedPage } from "./protected-page";
 import axios from "axios";
 
-export class CharacterSelection extends LitElement {
-
-    private readonly token = ""
+export class CharacterSelection extends ProtectedPage {
 
     // Positional offsets of slots from horizontal center and bottom of the page
     private readonly slot_positions: [string, string][] = [
@@ -25,8 +24,7 @@ export class CharacterSelection extends LitElement {
     @queryAll("selection-slot")
     private _slots!: NodeListOf<SelectionSlot>;
 
-    protected firstUpdated() {
-        // Get user characters
+    private async getCharacters() {
         axios.get("http://localhost:8080/api/v1/users/characters", {
             headers: {
                 Authorization: `Bearer ${this.token}`
@@ -54,10 +52,82 @@ export class CharacterSelection extends LitElement {
                 }
             }
         })
+        .catch(async error => {
+            if (error.response.status === 401) {
+                await this.refreshToken();
+                return await this.getCharacters()
+            }
+        })
+    }
 
-        // Define actions for when selection slots are clicked
+    private async getCharacterStats(selection_slot: SelectionSlot) {
+        axios.get(`http://localhost:8080/api/v1/users/characters/${selection_slot.character!.character_name}`, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+        })
+        .then(response => {
+            if (response.status === 200) {
+                const character: CharacterDisplay = selection_slot.character!;
+                character.level = response.data.level;
+                character.experience = response.data.experience;
+                character.gold = response.data.gold;
+                character.max_health = response.data.max_health;
+                character.health = response.data.health;
+                character.max_mana = response.data.max_mana;
+                character.mana = response.data.mana;
+                character.attack = response.data.attack;
+                character.defense = response.data.defense;
+                character.intelligence = response.data.intelligence;
+                character.speed = response.data.speed;
+                character.luck = response.data.luck;
+                character.dexterity = response.data.dexterity;
+                character.ability_points = response.data.ability_points;
+                character.skill_points = response.data.skill_points;
+                character.sword_proficiency = response.data.sword_proficiency;
+                character.axe_proficiency = response.data.axe_proficiency;
+                character.spear_proficiency = response.data.spear_proficiency;
+                character.dagger_proficiency = response.data.dagger_proficiency;
+                character.staff_proficiency = response.data.staff_proficiency;
+                character.bow_proficiency = response.data.bow_proficiency;
+
+                // Select new character slot
+                this._selected_character_slot = selection_slot;
+                this._selected_character_slot.selected = true;
+            }
+        })
+        .catch(async error => {
+            if (error.response.status === 401) {
+                await this.refreshToken();
+                return await this.getCharacterStats(selection_slot);
+            }
+        })
+    }
+
+    private async deleteCharacter() {
+        axios.delete(`http://localhost:8080/api/v1/users/characters/${this._selected_character_slot!.character!.character_name}`, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+        })
+        .then(response => {
+            if (response.status === 204) {
+                this._selected_character_slot!.character = null;
+                this._selected_character_slot!.selected = false;
+                this._selected_character_slot = null;
+            }
+        })
+        .catch(async error => {
+            if (error.response.status === 401) {
+                await this.refreshToken();
+                await this.deleteCharacter();
+            }
+        })
+    }
+
+    private setupSlots() {
         for (const [index, selection_slot] of this._slots.entries()) {
-            selection_slot.click_action = () => {
+            selection_slot.click_action = async () => {
                 // Prompt user to create a new character
                 if (selection_slot.character === null) {
                     this._confirmation_box.message = "Create new character?";
@@ -77,41 +147,7 @@ export class CharacterSelection extends LitElement {
 
                     // Make GET request for character stats (if necessary)
                     if (selection_slot.character!.level === 0) {
-                        axios.get(`http://localhost:8080/api/v1/users/characters/${selection_slot.character!.character_name}`, {
-                            headers: {
-                                Authorization: `Bearer ${this.token}`
-                            }
-                        })
-                        .then(response => {
-                            if (response.status === 200) {
-                                const character: CharacterDisplay = selection_slot.character!;
-                                character.level = response.data.level;
-                                character.experience = response.data.experience;
-                                character.gold = response.data.gold;
-                                character.max_health = response.data.max_health;
-                                character.health = response.data.health;
-                                character.max_mana = response.data.max_mana;
-                                character.mana = response.data.mana;
-                                character.attack = response.data.attack;
-                                character.defense = response.data.defense;
-                                character.intelligence = response.data.intelligence;
-                                character.speed = response.data.speed;
-                                character.luck = response.data.luck;
-                                character.dexterity = response.data.dexterity;
-                                character.ability_points = response.data.ability_points;
-                                character.skill_points = response.data.skill_points;
-                                character.sword_proficiency = response.data.sword_proficiency;
-                                character.axe_proficiency = response.data.axe_proficiency;
-                                character.spear_proficiency = response.data.spear_proficiency;
-                                character.dagger_proficiency = response.data.dagger_proficiency;
-                                character.staff_proficiency = response.data.staff_proficiency;
-                                character.bow_proficiency = response.data.bow_proficiency;
-
-                                // Select new character slot
-                                this._selected_character_slot = selection_slot;
-                                this._selected_character_slot.selected = true;
-                            }
-                        })
+                        await this.getCharacterStats(selection_slot);
                     } else {
                         // Select new character slot
                         this._selected_character_slot = selection_slot;
@@ -128,22 +164,22 @@ export class CharacterSelection extends LitElement {
         }
     }
 
+    protected async firstUpdated() {
+        // Define slot click actions
+        this.setupSlots();
+
+        // Get JWT
+        await super.firstUpdated();
+
+        // Get user characters
+        await this.getCharacters();
+    }
+
     private handleDelete() {
         this._confirmation_box.message = "Are you sure?";
         this._confirmation_box.action = () => {
             if (this._selected_character_slot !== null) {
-                axios.delete(`http://localhost:8080/api/v1/users/characters/${this._selected_character_slot.character!.character_name}`, {
-                    headers: {
-                        Authorization: `Bearer ${this.token}`
-                    }
-                })
-                .then(response => {
-                    if (response.status === 204) {
-                        this._selected_character_slot!.character = null;
-                        this._selected_character_slot!.selected = false;
-                        this._selected_character_slot = null;
-                    }
-                })
+                this.deleteCharacter()
             }
         }
         this._confirmation_box.display = true;
@@ -260,6 +296,7 @@ export class CharacterSelection extends LitElement {
             <div>
                 <button class="enter" ?disabled=${this._selected_character_slot === null} @click=${this.handleEnter}>Enter</button>
             </div>
+            ${this.auth_template}
         `
     }
 }
