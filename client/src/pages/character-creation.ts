@@ -76,7 +76,7 @@ export class CharacterCreation extends ProtectedPage {
         .then(response => {
             if (response.status === 201) {
                 this._notification_box.message = "Character successfully created!";
-                this._notification_box.action = () => location.pathname = "character-selection";
+                this._notification_box.close_action = () => location.pathname = "character-selection";
                 this._notification_box.display = true;
             }
         })
@@ -96,24 +96,10 @@ export class CharacterCreation extends ProtectedPage {
         defaultStyles,
         buttonStyles,
         css`
-        .selection {
-            width: 28em;
-            background-color: white;
-            border-style: solid;
-            border-color: var(--steel-blue);
-            border-width: 1em;
-            border-radius: 1.5em;
-        }
-
         character-display {
             position: absolute;
             bottom: 15%;
             left: 50%;
-        }
-
-        div, form {
-            display: flex;
-            flex-direction: column;
         }
 
         input {
@@ -125,15 +111,20 @@ export class CharacterCreation extends ProtectedPage {
 
         form {
             position: relative;
+            align-items: center;
             top: 2.5em;
             margin: 1.5em;
-            align-items: center;
+            width: 28em;
+            background-color: white;
+            border-style: solid;
+            border-color: var(--steel-blue);
+            border-width: 1em;
+            border-radius: 1.5em;
         }
 
         button {
             width: 8em;
             height: 4em;
-            font-weight: bold;
         }
     `];
 
@@ -144,7 +135,7 @@ export class CharacterCreation extends ProtectedPage {
                     <h1>Character Creation</h1>
                 </div>
                 <character-display></character-display>
-                <form class="selection">
+                <form>
                     <h2>Character Name</h2>
                     <input type="textBox" @input=${this.handleCharacterName} required/>
                     <h2>Gender</h2>

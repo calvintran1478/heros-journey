@@ -9,7 +9,7 @@ export class SelectionSlot extends LitElement {
 
     @property()
     public selected: boolean = false;
-    
+
     public click_action: () => void = function() { return; };
 
     static styles = css`

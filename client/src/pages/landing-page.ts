@@ -17,8 +17,6 @@ export class LandingPage extends LitElement {
         }
 
         div {
-            display: flex;
-            flex-direction: column;
             align-items: center;
         }
 
@@ -28,7 +26,6 @@ export class LandingPage extends LitElement {
             width: 12em;
             height: 3em;
             font-size: 2em;
-            font-weight: bold;
             background-color: var(--light-blue);
             opacity: 0.95;
         }

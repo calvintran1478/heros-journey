@@ -33,15 +33,7 @@ export class LoginPage extends LitElement {
             font-size: 2.5em;
         }
 
-        div {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
+        div, form {
             align-items: center;
         }
 
@@ -60,7 +52,6 @@ export class LoginPage extends LitElement {
             width: 10em;
             height: 3em;
             font-size: 1.5em;
-            font-weight: bold;
             background-color: #84addf;
             opacity: 0.85;
         }

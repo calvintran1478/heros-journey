@@ -131,7 +131,7 @@ export class CharacterSelection extends ProtectedPage {
                 // Prompt user to create a new character
                 if (selection_slot.character === null) {
                     this._confirmation_box.message = "Create new character?";
-                    this._confirmation_box.action = () => {
+                    this._confirmation_box.confirm_action = () => {
                         location.pathname = "character-creation";
                         sessionStorage.setItem("slot_number", index.toString());
                     }
@@ -177,7 +177,7 @@ export class CharacterSelection extends ProtectedPage {
 
     private handleDelete() {
         this._confirmation_box.message = "Are you sure?";
-        this._confirmation_box.action = () => {
+        this._confirmation_box.confirm_action = () => {
             if (this._selected_character_slot !== null) {
                 this.deleteCharacter()
             }
@@ -218,7 +218,6 @@ export class CharacterSelection extends ProtectedPage {
             position: fixed;
             top: 22%;
             right: 2.5em;
-            flex-direction: column;
             align-items: center;
         }
 
@@ -229,8 +228,6 @@ export class CharacterSelection extends ProtectedPage {
         }
 
         div {
-            display: flex;
-            flex-direction: column;
             align-items: center;
         }
 
@@ -253,7 +250,6 @@ export class CharacterSelection extends ProtectedPage {
         button {
             width: 8em;
             height: 4em;
-            font-weight: bold;
         }
     `];
 
@@ -261,41 +257,37 @@ export class CharacterSelection extends ProtectedPage {
         return html`
             <div>
                 <h1 class="title">Character Selection</h1>
-            </div>
-            <div>
                 ${this.slot_positions.map((pos) =>
                     html`<selection-slot style="margin-left: ${pos[0]}; bottom: ${pos[1]}"></selection-slot>`
                 )}
-            </div>
-            <form style="display: ${this._selected_character_slot ? "flex": "none"}" class="stat-box">
-                <h2>Character Name</h2>
-                <input type="textBox" class="character-name" disabled value=${this._selected_character_slot ? this._selected_character_slot.character!.character_name : ""}>
-                <div style="flex-direction: row">
-                    <div>
-                        <p>Level:</p>
-                        <p>Attack:</p>
-                        <p>Defense:</p>
-                        <p>Intelligence:</p>
-                        <p>Speed:</p>
-                        <p>Luck:</p>
-                        <p>Dexterity:</p>
+                <form style="display: ${this._selected_character_slot ? "flex": "none"}" class="stat-box">
+                    <h2>Character Name</h2>
+                    <input type="textBox" class="character-name" disabled value=${this._selected_character_slot ? this._selected_character_slot.character!.character_name : ""}>
+                    <div style="flex-direction: row">
+                        <div>
+                            <p>Level:</p>
+                            <p>Attack:</p>
+                            <p>Defense:</p>
+                            <p>Intelligence:</p>
+                            <p>Speed:</p>
+                            <p>Luck:</p>
+                            <p>Dexterity:</p>
+                        </div>
+                        <div>
+                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.level : 0} disabled>
+                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.attack : 0} disabled>
+                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.defense : 0} disabled>
+                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.intelligence : 0} disabled>
+                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.speed : 0} disabled>
+                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.luck : 0} disabled>
+                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.dexterity : 0} disabled>
+                        </div>
                     </div>
-                    <div>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.level : 0} disabled>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.attack : 0} disabled>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.defense : 0} disabled>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.intelligence : 0} disabled>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.speed : 0} disabled>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.luck : 0} disabled>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.dexterity : 0} disabled>
-                    </div>
-                </div>
-                <button style="background-color: var(--light-red)" type="button" @click=${this.handleDelete}>Delete</button>
-            </form>
-            <confirmation-box></confirmation-box>
-            <div>
+                    <button style="background-color: var(--light-red)" type="button" @click=${this.handleDelete}>Delete</button>
+                </form>
                 <button class="enter" ?disabled=${this._selected_character_slot === null} @click=${this.handleEnter}>Enter</button>
             </div>
+            <confirmation-box></confirmation-box>
             ${this.auth_template}
         `
     }

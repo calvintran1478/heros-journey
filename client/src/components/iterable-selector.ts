@@ -45,7 +45,6 @@ export class IterableSelector<T> extends LitElement {
         button {
             border: 0;
             background: transparent;
-            cursor: pointer;
         }
 
         button:hover {
@@ -59,7 +58,7 @@ export class IterableSelector<T> extends LitElement {
 
     render() {
         return html`
-            <div style="display: flex; flex-direction: row;">
+            <div style="flex-direction: row">
                 <button @click="${this.prev}">
                     <img src=${left_selector} />
                 </button>
