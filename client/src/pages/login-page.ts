@@ -52,7 +52,7 @@ export class LoginPage extends LitElement {
             width: 10em;
             height: 3em;
             font-size: 1.5em;
-            background-color: #84addf;
+            background-color: var(--ocean-blue);
             opacity: 0.85;
         }
 
@@ -76,11 +76,11 @@ export class LoginPage extends LitElement {
                 <form>
                     <div style="align-items: start; margin-bottom: 2em;">
                         <label for="email">Email</label>
-                        <input type="textBox" id="email">
+                        <input id="email" type="textBox">
                     </div>
                     <div style="align-items: start; margin-bottom: 2em;">
                         <label for="password">Password</label>
-                        <input type="password" id="password">
+                        <input id="password" type="password">
                     </div>
                     <button type="button" @click=${this.handleLogin}>Login</button>
                 </form>

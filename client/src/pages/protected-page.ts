@@ -16,7 +16,7 @@ export abstract class ProtectedPage extends LitElement {
 
     protected async firstUpdated() {
         this._auth_notification.message = "Session has expired. Please login";
-        this._auth_notification.action = () => location.pathname = "login";
+        this._auth_notification.close_action = () => location.pathname = "login";
         await this.refreshToken();
     }
 

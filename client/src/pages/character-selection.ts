@@ -1,4 +1,4 @@
-import { html, css } from "lit"
+import { html, css, nothing } from "lit"
 import { state, query, queryAll } from 'lit/decorators.js';
 import { ConfirmationBox } from "../components/confirmation-box";
 import { SelectionSlot } from "../components/selection-slot";
@@ -239,7 +239,7 @@ export class CharacterSelection extends ProtectedPage {
             width: 8.5em;
         }
 
-        p {
+        label {
             margin: 0.75em;
         }
 
@@ -260,31 +260,35 @@ export class CharacterSelection extends ProtectedPage {
                 ${this.slot_positions.map((pos) =>
                     html`<selection-slot style="margin-left: ${pos[0]}; bottom: ${pos[1]}"></selection-slot>`
                 )}
-                <form style="display: ${this._selected_character_slot ? "flex": "none"}" class="stat-box">
-                    <h2>Character Name</h2>
-                    <input type="textBox" class="character-name" disabled value=${this._selected_character_slot ? this._selected_character_slot.character!.character_name : ""}>
-                    <div style="flex-direction: row">
-                        <div>
-                            <p>Level:</p>
-                            <p>Attack:</p>
-                            <p>Defense:</p>
-                            <p>Intelligence:</p>
-                            <p>Speed:</p>
-                            <p>Luck:</p>
-                            <p>Dexterity:</p>
-                        </div>
-                        <div>
-                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.level : 0} disabled>
-                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.attack : 0} disabled>
-                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.defense : 0} disabled>
-                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.intelligence : 0} disabled>
-                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.speed : 0} disabled>
-                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.luck : 0} disabled>
-                            <input value=${this._selected_character_slot ? this._selected_character_slot.character!.dexterity : 0} disabled>
-                        </div>
-                    </div>
-                    <button style="background-color: var(--light-red)" type="button" @click=${this.handleDelete}>Delete</button>
-                </form>
+                ${this._selected_character_slot ? 
+                    html`
+                        <form class="stat-box">
+                            <label for="character-name" style="font-size: 1.5em">Character Name</label>
+                            <input id="character-name" type="textBox" class="character-name" value=${this._selected_character_slot.character!.character_name} disabled>
+                            <div style="flex-direction: row">
+                                <div>
+                                    <label for="level">Level:</label>
+                                    <label for="attack">Attack:</label>
+                                    <label for="defense">Defense:</label>
+                                    <label for="intelligence">Intelligence:</label>
+                                    <label for="speed">Speed:</label>
+                                    <label for="luck">Luck:</label>
+                                    <label for="dexterity">Dexterity:</label>
+                                </div>
+                                <div>
+                                    <input id="level" value=${this._selected_character_slot.character!.level} disabled>
+                                    <input id="attck" value=${this._selected_character_slot.character!.attack} disabled>
+                                    <input id="defense" value=${this._selected_character_slot.character!.defense} disabled>
+                                    <input id="intelligence" value=${this._selected_character_slot.character!.intelligence} disabled>
+                                    <input id="speed" value=${this._selected_character_slot.character!.speed} disabled>
+                                    <input id="luck" value=${this._selected_character_slot.character!.luck} disabled>
+                                    <input id="dexterity" value=${this._selected_character_slot.character!.dexterity} disabled>
+                                </div>
+                            </div>
+                            <button style="background-color: var(--light-red)" type="button" @click=${this.handleDelete}>Delete</button>
+                        </form>
+                    ` : nothing
+                }
                 <button class="enter" ?disabled=${this._selected_character_slot === null} @click=${this.handleEnter}>Enter</button>
             </div>
             <confirmation-box></confirmation-box>

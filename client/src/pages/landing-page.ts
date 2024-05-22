@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit"
 import { defaultStyles, buttonStyles } from "../styles/style"
+import "../styles/styles.css";
 
 export class LandingPage extends LitElement {
 
