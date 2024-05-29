@@ -5,7 +5,6 @@ import (
 	"heros-journey/server/utils"
 	"os"
 	"strconv"
-	"strings"
 	"net/http"
 	"net/mail"
 	"gorm.io/gorm"
@@ -180,7 +179,7 @@ func SendResetPasswordEmail(c *gin.Context) {
 	// Search for user
 	var user models.User
 	if err = db.Where("email = ?", input.Email).First(&user).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User email not found"})
+		c.Status(http.StatusOK)
 		return
 	}
 
@@ -192,16 +191,7 @@ func SendResetPasswordEmail(c *gin.Context) {
 	}
 
 	// Send email to reset password
-	subject := "Reset Password"
-
-	var body strings.Builder
-	body.WriteString("Hi, we have received a request to reset your password for your Hero's Journey account.")
-	body.WriteString(" To change your password please click on the link below.\n\n")
-	body.WriteString(token)	// Will later pass token through a verification link
-	body.WriteString("\n\nIf this was not you kindly ignore this message.\n\n")
-	body.WriteString("Regards,\nThe Hero's Journey Team")
-
-	if err = utils.SendEmail(input.Email, subject, body.String()); err != nil {
+	if err = utils.SendResetPasswordEmail(input.Email, token); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
