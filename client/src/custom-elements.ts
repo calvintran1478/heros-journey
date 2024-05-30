@@ -1,5 +1,7 @@
 import { LandingPage } from "./pages/landing-page";
 import { LoginPage } from "./pages/login-page";
+import { ResetPassword } from "./pages/reset-password";
+import { ChangePassword } from "./pages/change-password";
 import { CharacterCreation } from "./pages/character-creation";
 import { CharacterSelection } from "./pages/character-selection";
 import { IterableSelector } from "./components/iterable-selector";
@@ -13,6 +15,8 @@ import { ConfirmationBox } from "./components/confirmation-box";
 // Page elements
 customElements.define('landing-page', LandingPage);
 customElements.define('login-page', LoginPage);
+customElements.define('reset-password', ResetPassword);
+customElements.define('change-password', ChangePassword)
 customElements.define('character-creation', CharacterCreation);
 customElements.define('character-selection', CharacterSelection);
 

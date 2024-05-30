@@ -179,7 +179,7 @@ func SendResetPasswordEmail(c *gin.Context) {
 	// Search for user
 	var user models.User
 	if err = db.Where("email = ?", input.Email).First(&user).Error; err != nil {
-		c.Status(http.StatusOK)
+		c.JSON(http.StatusNotFound, gin.H{"error": "User email not found"})
 		return
 	}
 
@@ -237,5 +237,5 @@ func ChangeUserPassword(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.Status(http.StatusNoContent)
 }

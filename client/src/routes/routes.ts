@@ -21,6 +21,22 @@ export const routes: Route[] = [
                 }
             },
             {
+                path: 'reset-password',
+                component: 'reset-password',
+                action: async() => {
+                    await import('../pages/reset-password');
+                    document.getElementById("html")!.className = "landing-page";
+                }
+            },
+            {
+                path: 'change-password',
+                component: 'change-password',
+                action: async() => {
+                    await import('../pages/change-password');
+                    document.getElementById("html")!.className = "landing-page";
+                }
+            },
+            {
                 path: 'character-creation',
                 component: 'character-creation',
                 action: async () => {
