@@ -1,17 +1,14 @@
 import { LitElement, html, css } from "lit";
 import { query } from "lit/decorators.js";
-import { NotificationBox } from "../components/notification-box"; 
+import { NotificationMixin } from "../mixins/notification-mixin";
 import { landingFormStyles } from "../styles/style";
 import axios from "axios";
 
-export class ResetPassword extends LitElement {
+export class ResetPassword extends NotificationMixin(LitElement) {
 
     private email: string = "";
 
-    @query("notification-box")
-    private _notification_box!: NotificationBox
-
-    @query("form")
+    @query("form", true)
     private _form!: HTMLFormElement
 
     private updateEmail(event: Event) {
@@ -25,16 +22,15 @@ export class ResetPassword extends LitElement {
         })
         .then(response => {
             if (response.status === 200) {
-                this._notification_box.message = "Password recovery link was sent to your inbox";
+                this._notification_box.display("Password recovery link was sent to your inbox");
             }
         })
         .catch(error => {
             if (error.response.status === 404) {
-                this._notification_box.message = "Account not found";
+                this._notification_box.display("Account not found");
             }
         })
         .finally(() => {
-            this._notification_box.display = true;
             this._form.reset();
         })
     }
@@ -65,7 +61,7 @@ export class ResetPassword extends LitElement {
                     <a href="login">Return to Login</a>
                 </form>
             </div>
-            <notification-box></notification-box>
+            ${this.notification_template}
         `;
     }
 }

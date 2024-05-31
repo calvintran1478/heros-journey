@@ -3,18 +3,25 @@ import { PopupBox } from "./popup-box";
 
 export class ConfirmationBox extends PopupBox {
 
-    public confirm_action: () => void = function() { return };
+    protected confirm_action: () => void = function() { return };
 
     protected confirm() {
         this.confirm_action();
-        this.display = false;
+        this._display = false;
+    }
+
+    public display(message?: string, close_action?: () => void, confirm_action?: () => void) {
+        if (confirm_action !== undefined) {
+            this.confirm_action = confirm_action;
+        }
+        super.display(message, close_action);
     }
 
     static styles = super.styles;
 
     render() {
         return html`
-            <div style="display:${this.display? 'flex' : 'none'}" class="page">
+            <div style="display:${this._display? 'flex' : 'none'}" class="page">
                 <div class="box">
                     <p>${this.message}</p>
                     <div style="flex-direction: row;">

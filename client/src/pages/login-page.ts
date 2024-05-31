@@ -1,14 +1,15 @@
 import { LitElement, html } from "lit"
 import { query } from "lit/decorators.js";
+import { NotificationMixin } from "../mixins/notification-mixin";
 import { landingFormStyles } from "../styles/style";
 import axios from "axios";
 
-export class LoginPage extends LitElement {
+export class LoginPage extends NotificationMixin(LitElement) {
 
-    @query("#email")
+    @query("#email", true)
     private _email!: HTMLInputElement;
 
-    @query("#password")
+    @query("#password", true)
     private _password!: HTMLInputElement;
 
     private handleLogin() {
@@ -21,6 +22,15 @@ export class LoginPage extends LitElement {
         .then(response => {
             if (response.status === 200) {
                 location.pathname = "character-selection";
+            }
+        })
+        .catch(error => {
+            if (error.response.status === 401) {
+                this._notification_box.display("Incorrect password");
+            }
+
+            else if (error.response.status === 404) {
+                this._notification_box.display("Email not found");
             }
         })
     }
@@ -44,6 +54,7 @@ export class LoginPage extends LitElement {
                     <a href="reset-password">Forgot Password?</a>
                 </form>
             </div>
+            ${this.notification_template}
         `
     }
 }

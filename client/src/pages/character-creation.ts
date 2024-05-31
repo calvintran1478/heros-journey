@@ -1,7 +1,6 @@
 import { html, css } from 'lit';
 import { query } from 'lit/decorators.js';
 import { IterableSelector } from '../components/iterable-selector';
-import { NotificationBox } from '../components/notification-box';
 import { CharacterDisplay } from '../components/character-display';
 import { defaultStyles, buttonStyles } from '../styles/style';
 import { ProtectedPage } from './protected-page';
@@ -26,9 +25,6 @@ export class CharacterCreation extends ProtectedPage {
 
     @query("#eye-colour")
     private _eye_colour!: IterableSelector<string>
-
-    @query("notification-box")
-    private _notification_box!: NotificationBox
 
     @query("character-display")
     private _character_display!: CharacterDisplay
@@ -74,9 +70,7 @@ export class CharacterCreation extends ProtectedPage {
         })
         .then(response => {
             if (response.status === 201) {
-                this._notification_box.message = "Character successfully created!";
-                this._notification_box.close_action = () => location.pathname = "character-selection";
-                this._notification_box.display = true;
+                this._notification_box.display("Character successfully created!", () => location.pathname = "character-selection")
             }
         })
         .catch(async error => {
@@ -85,8 +79,7 @@ export class CharacterCreation extends ProtectedPage {
                 this.handleSubmit();
             }
             else if (error.response.status === 409) {
-                this._notification_box.message = "Character with the given name already exists";
-                this._notification_box.display = true;
+                this._notification_box.display("Character with the given name already exists")
             }
         });
     };
@@ -156,7 +149,7 @@ export class CharacterCreation extends ProtectedPage {
             </form>
             <character-display></character-display>
             <notification-box></notification-box>
-            ${this.auth_template}
+            ${this.notification_template}
         `;
     }
 }

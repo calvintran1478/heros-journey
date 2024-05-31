@@ -15,7 +15,7 @@ export class CharacterSelection extends ProtectedPage {
         ["-45em", "20%"], ["0", "20%"], ["45em", "20%"]     // Front row
     ];
 
-    @query("confirmation-box")
+    @query("confirmation-box", true)
     private _confirmation_box!: ConfirmationBox;
 
     @state()
@@ -130,12 +130,10 @@ export class CharacterSelection extends ProtectedPage {
             selection_slot.click_action = async () => {
                 // Prompt user to create a new character
                 if (selection_slot.character === null) {
-                    this._confirmation_box.message = "Create new character?";
-                    this._confirmation_box.confirm_action = () => {
+                    this._confirmation_box.display("Create new character?", undefined, () => {
                         location.pathname = "character-creation";
                         sessionStorage.setItem("slot_number", index.toString());
-                    }
-                    this._confirmation_box.display = true;
+                    })
                 }
 
                 // Select character and display stats
@@ -176,13 +174,11 @@ export class CharacterSelection extends ProtectedPage {
     }
 
     private handleDelete() {
-        this._confirmation_box.message = "Are you sure?";
-        this._confirmation_box.confirm_action = () => {
+        this._confirmation_box.display("Are you sure?", undefined, () => {
             if (this._selected_character_slot !== null) {
                 this.deleteCharacter()
             }
-        }
-        this._confirmation_box.display = true;
+        });
     }
 
     private handleEnter() {
@@ -292,7 +288,7 @@ export class CharacterSelection extends ProtectedPage {
                 <button class="enter" ?disabled=${this._selected_character_slot === null} @click=${this.handleEnter}>Enter</button>
             </div>
             <confirmation-box></confirmation-box>
-            ${this.auth_template}
+            ${this.notification_template}
         `
     }
 }

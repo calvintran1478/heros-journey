@@ -7,7 +7,7 @@ export class NotificationBox extends PopupBox {
 
     render() {
         return html`
-            <div style="display:${this.display? 'flex' : 'none'}" class="page">
+            <div style="display:${this._display? 'flex' : 'none'}" class="page">
                 <div class="box">
                     <p>${this.message}</p>
                     <button type="button" @click=${this.close}>Okay</button>

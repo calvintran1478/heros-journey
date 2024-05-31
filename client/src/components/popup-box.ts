@@ -4,16 +4,26 @@ import { defaultStyles, buttonStyles } from "../styles/style";
 
 export abstract class PopupBox extends LitElement {
     @property()
-    public message: string = "";
+    protected message: string = "";
 
     @property()
-    public display: boolean = false;
+    protected _display: boolean = false;
 
-    public close_action: () => void = function() { return };
+    protected close_action: () => void = function() { return };
 
     protected close() {
         this.close_action();
-        this.display = false;
+        this._display = false;
+    }
+
+    public display(message?: string, close_action?: () => void) {
+        if (message !== undefined) {
+            this.message = message;
+        }
+        if (close_action !== undefined) {
+            this.close_action = close_action;
+        }
+        this._display = true;
     }
 
     static styles = [

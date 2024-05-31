@@ -1,19 +1,16 @@
 import { LitElement, html, css } from "lit";
 import { query } from "lit/decorators.js";
-import { NotificationBox } from "../components/notification-box"; 
+import { NotificationMixin } from "../mixins/notification-mixin";
 import { landingFormStyles } from "../styles/style";
 import axios from "axios";
 
-export class ChangePassword extends LitElement {
+export class ChangePassword extends NotificationMixin(LitElement) {
 
     private password: string = "";
     private retypedPassword: string = "";
     private token: string = "";
 
-    @query("notification-box")
-    private _notification_box!: NotificationBox
-
-    @query("form")
+    @query("form", true)
     private _form!: HTMLFormElement
 
     private updatePassword(event: Event) {
@@ -29,8 +26,7 @@ export class ChangePassword extends LitElement {
     private changePassword() {
         // Check that the password fields match
         if (this.password !== this.retypedPassword) {
-            this._notification_box.message = "Passwords must match";
-            this._notification_box.display = true;
+            this._notification_box.display("Passwords must match")
             return;
         }
 
@@ -43,18 +39,14 @@ export class ChangePassword extends LitElement {
         })
         .then(response => {
             if (response.status === 204) {
-                this._notification_box.message = "Password successfully changed";
-                this._notification_box.close_action = () => location.pathname = "login";
+                this._notification_box.display("Password successfully changed", () => location.pathname = "login")
             }
         })
         .catch(error => {
             if (error.response.status === 401) {
-                this._notification_box.message = "Recovery link has expired or is invalid";
+                this._notification_box.display("Recovery link has expired or is invalid")
                 this._form.reset()
             }
-        })
-        .finally(() => {
-            this._notification_box.display = true;
         })
     }
 
@@ -90,7 +82,7 @@ export class ChangePassword extends LitElement {
                     <button type="button" @click=${this.changePassword}>Confirm</button>
                 </form>
             </div>
-            <notification-box></notification-box>
+            ${this.notification_template}
         `;
     }
 }
