@@ -25,13 +25,17 @@ export class ChangePassword extends NotificationMixin(LitElement) {
         this.retypedPassword = input.value;
     }
 
-    private changePassword() {
+    private changePassword(event: Event) {
+        // Prevent refresh
+        event.preventDefault();
+
         // Check that the password fields match
         if (this.password !== this.retypedPassword) {
             this._notification_box.display("Passwords must match");
             return;
         }
 
+        // Update user password
         axios.patch("http://localhost:8080/api/v1/users/password", {
             password: this.password
         }, {
@@ -72,16 +76,16 @@ export class ChangePassword extends NotificationMixin(LitElement) {
         return html`
             <div class="landing-form">
                 <h1><u>Change Password</u></h1>
-                <form>
+                <form @submit=${this.changePassword}>
                     <div style="align-items: start; margin-bottom: 2em;">
                         <label for="password">New Password</label>
-                        <input id="password" type="password" @change=${this.updatePassword}>
+                        <input id="password" type="password" minlength="8" @change=${this.updatePassword} required>
                     </div>
                     <div style="align-items: start; margin-bottom: 2em;">
                         <label for="confirm-password">Confirm Password</label>
-                        <input id="-confirm-password" type="password" @change=${this.updateRetypedPassword}>
+                        <input id="-confirm-password" type="password" @change=${this.updateRetypedPassword} required>
                     </div>
-                    <button type="button" @click=${this.changePassword}>Confirm</button>
+                    <button>Confirm</button>
                 </form>
             </div>
             ${this.notification_template}

@@ -21,7 +21,11 @@ export class RegisterPage extends NotificationMixin(LitElement) {
         this.password = input.value;
     }
 
-    private handleRegister() {
+    private handleRegister(event: Event) {
+        // Prevent refresh
+        event.preventDefault();
+
+        // Register user
         axios.post("http://localhost:8080/api/v1/users", {
             email: this.email,
             password: this.password
@@ -44,16 +48,16 @@ export class RegisterPage extends NotificationMixin(LitElement) {
         return html`
             <div class="landing-form">
                 <h1><u>Register</u></h1>
-                <form>
+                <form @submit=${this.handleRegister}>
                     <div style="align-items: start; margin-bottom: 2em;">
                         <label style="margin-top: 0;" for="email">Email</label>
-                        <input id="email" @change=${this.updateEmail}>
+                        <input id="email" type="email" @change=${this.updateEmail} required>
                     </div>
                     <div style="align-items: start; margin-bottom: 1em;">
                         <label style="margin-top: 0.5em;" for="password">Password</label>
-                        <input id="password" type="password" @change=${this.updatePassword}>
+                        <input id="password" type="password" minlength="8" @change=${this.updatePassword} required>
                     </div>
-                    <button type="button" @click=${this.handleRegister}>Create Account</button>
+                    <button>Create Account</button>
                     <hr>
                     <div style="flex-direction: row">
                         <span>Already have an account?</span>

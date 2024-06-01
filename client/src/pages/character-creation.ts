@@ -59,7 +59,11 @@ export class CharacterCreation extends ProtectedPage {
         Router.go("character-selection");
     }
 
-    private handleSubmit() {
+    private handleSubmit(event: Event) {
+        // Prevent refresh
+        event.preventDefault();
+
+        // Create character
         axios.post("http://localhost:8080/api/v1/users/characters", {
             slot_number: parseInt(sessionStorage.getItem("slot_number")!),
             character_name: this.character_name,
@@ -80,7 +84,7 @@ export class CharacterCreation extends ProtectedPage {
         .catch(async error => {
             if (error.response.status === 401) {
                 await this.refreshToken();
-                this.handleSubmit();
+                this.handleSubmit(event);
             }
             else if (error.response.status === 409) {
                 this._notification_box.display("Character with the given name already exists");
@@ -135,7 +139,7 @@ export class CharacterCreation extends ProtectedPage {
             <div style="align-items: center;">
                 <h1>Character Creation</h1>
             </div>
-            <form>
+            <form @submit=${this.handleSubmit}>
                 <label for="character-name">Character Name</label>
                 <input id="character-name" @change=${this.handleCharacterName} required/>
                 <label>Gender</label>
@@ -148,7 +152,7 @@ export class CharacterCreation extends ProtectedPage {
                 <iterable-selector id="eye-colour" .options=${this.eye_colour}></iterable-selector>
                 <div style="flex-direction: row;">
                     <button style="background-color: var(--dark-gray)" type="button" @click=${this.handleGoBack}>Go back</button>
-                    <button style="background-color: var(--light-green)" type="button" @click=${this.handleSubmit}>Confirm</button>
+                    <button style="background-color: var(--light-green)">Confirm</button>
                 </div>
             </form>
             <character-display></character-display>

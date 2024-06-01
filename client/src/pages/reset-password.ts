@@ -17,7 +17,11 @@ export class ResetPassword extends NotificationMixin(LitElement) {
         this.email = input.value;
     }
 
-    private sendRestPasswordEmail() {
+    private sendRestPasswordEmail(event: Event) {
+        // Prevent refresh
+        event.preventDefault();
+
+        // Send email to recover user password
         axios.post("http://localhost:8080/api/v1/users/reset-password-email", {
             email: this.email
         })
@@ -53,12 +57,12 @@ export class ResetPassword extends NotificationMixin(LitElement) {
         return html`
             <div class="landing-form">
                 <h1><u>Reset Password</u></h1>
-                <form>
+                <form @submit=${this.sendRestPasswordEmail}>
                     <div style="align-items: start; margin-bottom: 2em;">
                         <label for="email">Email</label>
-                        <input id="email" @change=${this.updateEmail}>
+                        <input id="email" type="email" @change=${this.updateEmail} required>
                     </div>
-                    <button type="button" @click=${this.sendRestPasswordEmail}>Next</button>
+                    <button>Next</button>
                     <a href="login">Return to Login</a>
                 </form>
             </div>

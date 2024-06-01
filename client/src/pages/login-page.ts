@@ -21,7 +21,11 @@ export class LoginPage extends NotificationMixin(LitElement) {
         this.password = input.value;
     }
 
-    private handleLogin() {
+    private handleLogin(event: Event) {
+        // Prevent refresh
+        event.preventDefault();
+
+        // Login user
         axios.post("http://localhost:8080/api/v1/users/login", {
             email: this.email,
             password: this.password,
@@ -50,16 +54,16 @@ export class LoginPage extends NotificationMixin(LitElement) {
         return html`
             <div class="landing-form">
                 <h1><u>Login</u></h1>
-                <form>
+                <form @submit=${this.handleLogin}>
                     <div style="align-items: start; margin-bottom: 2em;">
                         <label style="margin-top: 0;" for="email">Email</label>
-                        <input id="email" @change=${this.updateEmail}>
+                        <input id="email" type="email" @change=${this.updateEmail} required>
                     </div>
                     <div style="align-items: start; margin-bottom: 1em;">
                         <label style="margin-top: 0.5em;" for="password">Password</label>
-                        <input id="password" type="password" @change=${this.updatePassword}>
+                        <input id="password" type="password" @change=${this.updatePassword} required>
                     </div>
-                    <button type="button" @click=${this.handleLogin}>Login</button>
+                    <button>Login</button>
                     <hr>
                     <div style="flex-direction: row">
                         <span>Need an account?</span>
