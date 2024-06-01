@@ -1,12 +1,12 @@
-import { LitElement, html } from "lit"
+import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { Router } from "@vaadin/router";
 import { NotificationMixin } from "../mixins/notification-mixin";
 import { landingFormStyles } from "../styles/style";
 import axios from "axios";
 
-@customElement("login-page")
-export class LoginPage extends NotificationMixin(LitElement) {
+@customElement("register-page")
+export class RegisterPage extends NotificationMixin(LitElement) {
 
     private email: string = "";
     private password: string = "";
@@ -21,25 +21,19 @@ export class LoginPage extends NotificationMixin(LitElement) {
         this.password = input.value;
     }
 
-    private handleLogin() {
-        axios.post("http://localhost:8080/api/v1/users/login", {
+    private handleRegister() {
+        axios.post("http://localhost:8080/api/v1/users", {
             email: this.email,
-            password: this.password,
-        },{
-            withCredentials: true
+            password: this.password
         })
         .then(response => {
-            if (response.status === 200) {
-                Router.go("character-selection");
+            if (response.status === 201) {
+                this._notification_box.display("Account created", () => Router.go("login"));
             }
         })
         .catch(error => {
-            if (error.response.status === 401) {
-                this._notification_box.display("Incorrect password");
-            }
-
-            else if (error.response.status === 404) {
-                this._notification_box.display("Email not found");
+            if (error.response.status === 409) {
+                this._notification_box.display("Account with email already exists");
             }
         })
     }
@@ -49,7 +43,7 @@ export class LoginPage extends NotificationMixin(LitElement) {
     render() {
         return html`
             <div class="landing-form">
-                <h1><u>Login</u></h1>
+                <h1><u>Register</u></h1>
                 <form>
                     <div style="align-items: start; margin-bottom: 2em;">
                         <label style="margin-top: 0;" for="email">Email</label>
@@ -59,13 +53,12 @@ export class LoginPage extends NotificationMixin(LitElement) {
                         <label style="margin-top: 0.5em;" for="password">Password</label>
                         <input id="password" type="password" @change=${this.updatePassword}>
                     </div>
-                    <button type="button" @click=${this.handleLogin}>Login</button>
+                    <button type="button" @click=${this.handleRegister}>Create Account</button>
                     <hr>
                     <div style="flex-direction: row">
-                        <span>Need an account?</span>
-                        <a href="register">Register</a>
+                        <span>Already have an account?</span>
+                        <a href="login">Login</a>
                     </div>
-                    <a href="reset-password">Forgot Password?</a>
                 </form>
             </div>
             ${this.notification_template}

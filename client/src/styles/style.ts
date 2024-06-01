@@ -78,10 +78,27 @@ export const landingFormStyles = [
         }
 
         a {
-            margin: 1em;
+            margin: 0.5em;
             font-size: 1.5em;
             font-weight: bold;
             color: black;
             opacity: 0.5;
+        }
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        hr {
+            border: 1px solid silver;
+            margin: 1em;
+            margin-bottom: 2em;
+            width: 100%;
+        }
+
+        span {
+            margin: 0.5em;
+            font-size: 1.5em;
+            color: black;
         }
     `];

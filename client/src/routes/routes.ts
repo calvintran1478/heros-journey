@@ -15,6 +15,14 @@ export const routes: Route[] = [
                 }
             },
             {
+                path: 'register',
+                component: 'register-page',
+                action: async () => {
+                    await import('../pages/register-page');
+                    htmlElement!.className = "landing-page";
+                }
+            },
+            {
                 path: 'login',
                 component: 'login-page',
                 action: async () => {
