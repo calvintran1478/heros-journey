@@ -1,6 +1,7 @@
 import { LitElement, TemplateResult, html } from "lit";
 import { query } from "lit/decorators.js";
 import { NotificationBox } from "../components/notification-box";
+import "../components/notification-box"
 
 type Constructor<T = {}> = new (...args: any[]) => T;
 

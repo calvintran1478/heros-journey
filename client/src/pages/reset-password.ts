@@ -1,9 +1,10 @@
 import { LitElement, html, css } from "lit";
-import { query } from "lit/decorators.js";
+import { customElement, query } from "lit/decorators.js";
 import { NotificationMixin } from "../mixins/notification-mixin";
 import { landingFormStyles } from "../styles/style";
 import axios from "axios";
 
+@customElement("reset-password")
 export class ResetPassword extends NotificationMixin(LitElement) {
 
     private email: string = "";
@@ -55,7 +56,7 @@ export class ResetPassword extends NotificationMixin(LitElement) {
                 <form>
                     <div style="align-items: start; margin-bottom: 2em;">
                         <label for="email">Email</label>
-                        <input id="email" type="textBox" @change=${this.updateEmail}>
+                        <input id="email" @change=${this.updateEmail}>
                     </div>
                     <button type="button" @click=${this.sendRestPasswordEmail}>Next</button>
                     <a href="login">Return to Login</a>

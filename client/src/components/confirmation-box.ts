@@ -1,6 +1,8 @@
 import { html } from "lit";
+import { customElement } from "lit/decorators.js";
 import { PopupBox } from "./popup-box";
 
+@customElement("confirmation-box")
 export class ConfirmationBox extends PopupBox {
 
     protected confirm_action: () => void = function() { return };

@@ -1,5 +1,7 @@
 import { Route } from "@vaadin/router";
 
+const htmlElement = document.getElementById("html")
+
 export const routes: Route[] = [
     {
         path: '/',
@@ -9,7 +11,7 @@ export const routes: Route[] = [
                 component: 'landing-page',
                 action: async () => {
                     await import('../pages/landing-page');
-                    document.getElementById("html")!.className = "landing-page";
+                    htmlElement!.className = "landing-page";
                 }
             },
             {
@@ -17,7 +19,7 @@ export const routes: Route[] = [
                 component: 'login-page',
                 action: async () => {
                     await import('../pages/login-page');
-                    document.getElementById("html")!.className = "landing-page";
+                    htmlElement!.className = "landing-page";
                 }
             },
             {
@@ -25,7 +27,7 @@ export const routes: Route[] = [
                 component: 'reset-password',
                 action: async() => {
                     await import('../pages/reset-password');
-                    document.getElementById("html")!.className = "landing-page";
+                    htmlElement!.className = "landing-page";
                 }
             },
             {
@@ -33,7 +35,7 @@ export const routes: Route[] = [
                 component: 'change-password',
                 action: async() => {
                     await import('../pages/change-password');
-                    document.getElementById("html")!.className = "landing-page";
+                    htmlElement!.className = "landing-page";
                 }
             },
             {
@@ -41,7 +43,7 @@ export const routes: Route[] = [
                 component: 'character-creation',
                 action: async () => {
                     await import('../pages/character-creation');
-                    document.getElementById("html")!.className = "character-creation";
+                    htmlElement!.className = "character-creation";
                 }
             },
             {
@@ -49,7 +51,7 @@ export const routes: Route[] = [
                 component: 'character-selection',
                 action: async () => {
                     await import('../pages/character-selection');
-                    document.getElementById("html")!.className = "character-selection"
+                    htmlElement!.className = "character-selection"
                 }
             }
         ]

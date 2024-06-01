@@ -1,9 +1,11 @@
 import { LitElement, html, css } from "lit";
-import { query } from "lit/decorators.js";
+import { customElement, query } from "lit/decorators.js";
+import { Router } from "@vaadin/router";
 import { NotificationMixin } from "../mixins/notification-mixin";
 import { landingFormStyles } from "../styles/style";
 import axios from "axios";
 
+@customElement("change-password")
 export class ChangePassword extends NotificationMixin(LitElement) {
 
     private password: string = "";
@@ -26,7 +28,7 @@ export class ChangePassword extends NotificationMixin(LitElement) {
     private changePassword() {
         // Check that the password fields match
         if (this.password !== this.retypedPassword) {
-            this._notification_box.display("Passwords must match")
+            this._notification_box.display("Passwords must match");
             return;
         }
 
@@ -39,13 +41,13 @@ export class ChangePassword extends NotificationMixin(LitElement) {
         })
         .then(response => {
             if (response.status === 204) {
-                this._notification_box.display("Password successfully changed", () => location.pathname = "login")
+                this._notification_box.display("Password successfully changed", () => Router.go("login"));
             }
         })
         .catch(error => {
             if (error.response.status === 401) {
-                this._notification_box.display("Recovery link has expired or is invalid")
-                this._form.reset()
+                this._notification_box.display("Recovery link has expired or is invalid");
+                this._form.reset();
             }
         })
     }

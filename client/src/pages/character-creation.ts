@@ -1,11 +1,15 @@
 import { html, css } from 'lit';
-import { query } from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
+import { Router } from '@vaadin/router';
 import { IterableSelector } from '../components/iterable-selector';
 import { CharacterDisplay } from '../components/character-display';
 import { defaultStyles, buttonStyles } from '../styles/style';
 import { ProtectedPage } from './protected-page';
 import axios from 'axios';
+import "../components/iterable-selector"
+import "../components/character-display"
 
+@customElement("character-creation")
 export class CharacterCreation extends ProtectedPage {
     private readonly genders = ["Male", "Female"];
     private readonly hair_colour = ["Black", "Brown", "Blonde", "White", "Gray"];
@@ -52,7 +56,7 @@ export class CharacterCreation extends ProtectedPage {
     }
 
     private handleGoBack() {
-        location.pathname = "character-selection";
+        Router.go("character-selection");
     }
 
     private handleSubmit() {
@@ -70,7 +74,7 @@ export class CharacterCreation extends ProtectedPage {
         })
         .then(response => {
             if (response.status === 201) {
-                this._notification_box.display("Character successfully created!", () => location.pathname = "character-selection")
+                this._notification_box.display("Character successfully created!", () => Router.go("character-selection"));
             }
         })
         .catch(async error => {
@@ -79,7 +83,7 @@ export class CharacterCreation extends ProtectedPage {
                 this.handleSubmit();
             }
             else if (error.response.status === 409) {
-                this._notification_box.display("Character with the given name already exists")
+                this._notification_box.display("Character with the given name already exists");
             }
         });
     };
@@ -133,7 +137,7 @@ export class CharacterCreation extends ProtectedPage {
             </div>
             <form>
                 <label for="character-name">Character Name</label>
-                <input id="character-name" type="textBox" @change=${this.handleCharacterName} required/>
+                <input id="character-name" @change=${this.handleCharacterName} required/>
                 <label>Gender</label>
                 <iterable-selector id="gender" .options=${this.genders}></iterable-selector>
                 <label>Hair Colour</label>
@@ -148,7 +152,6 @@ export class CharacterCreation extends ProtectedPage {
                 </div>
             </form>
             <character-display></character-display>
-            <notification-box></notification-box>
             ${this.notification_template}
         `;
     }

@@ -1,9 +1,11 @@
 import { LitElement, html } from "lit"
-import { query } from "lit/decorators.js";
+import { customElement, query } from "lit/decorators.js";
+import { Router } from "@vaadin/router";
 import { NotificationMixin } from "../mixins/notification-mixin";
 import { landingFormStyles } from "../styles/style";
 import axios from "axios";
 
+@customElement("login-page")
 export class LoginPage extends NotificationMixin(LitElement) {
 
     @query("#email", true)
@@ -21,7 +23,7 @@ export class LoginPage extends NotificationMixin(LitElement) {
         })
         .then(response => {
             if (response.status === 200) {
-                location.pathname = "character-selection";
+                Router.go("character-selection");
             }
         })
         .catch(error => {
@@ -44,7 +46,7 @@ export class LoginPage extends NotificationMixin(LitElement) {
                 <form>
                     <div style="align-items: start; margin-bottom: 2em;">
                         <label for="email">Email</label>
-                        <input id="email" type="textBox">
+                        <input id="email">
                     </div>
                     <div style="align-items: start; margin-bottom: 2em;">
                         <label for="password">Password</label>

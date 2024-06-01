@@ -1,12 +1,16 @@
 import { html, css, nothing } from "lit"
-import { state, query, queryAll } from 'lit/decorators.js';
+import { customElement, state, query, queryAll } from 'lit/decorators.js';
+import { Router } from "@vaadin/router";
 import { ConfirmationBox } from "../components/confirmation-box";
 import { SelectionSlot } from "../components/selection-slot";
 import { CharacterDisplay } from "../components/character-display";
 import { defaultStyles, buttonStyles } from "../styles/style";
 import { ProtectedPage } from "./protected-page";
 import axios from "axios";
+import "../components/confirmation-box"
+import "../components/selection-slot"
 
+@customElement("character-selection")
 export class CharacterSelection extends ProtectedPage {
 
     // Positional offsets of slots from horizontal center and bottom of the page
@@ -55,7 +59,7 @@ export class CharacterSelection extends ProtectedPage {
         .catch(async error => {
             if (error.response.status === 401) {
                 await this.refreshToken();
-                return await this.getCharacters()
+                return await this.getCharacters();
             }
         })
     }
@@ -131,7 +135,7 @@ export class CharacterSelection extends ProtectedPage {
                 // Prompt user to create a new character
                 if (selection_slot.character === null) {
                     this._confirmation_box.display("Create new character?", undefined, () => {
-                        location.pathname = "character-creation";
+                        Router.go("character-creation");
                         sessionStorage.setItem("slot_number", index.toString());
                     })
                 }
@@ -183,7 +187,7 @@ export class CharacterSelection extends ProtectedPage {
 
     private handleEnter() {
         sessionStorage.setItem("character_name", this._selected_character_slot!.character!.character_name);
-        location.pathname = "world";
+        Router.go("world");
     }
 
     static styles = [
@@ -260,7 +264,7 @@ export class CharacterSelection extends ProtectedPage {
                     html`
                         <form class="stat-box">
                             <label for="character-name" style="font-size: 1.5em">Character Name</label>
-                            <input id="character-name" type="textBox" class="character-name" value=${this._selected_character_slot.character!.character_name} disabled>
+                            <input id="character-name" class="character-name" value=${this._selected_character_slot.character!.character_name} disabled>
                             <div style="flex-direction: row">
                                 <div>
                                     <label for="level">Level:</label>

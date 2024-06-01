@@ -1,11 +1,13 @@
 import { LitElement, html, css } from "lit"
+import { customElement } from "lit/decorators.js";
+import { Router } from "@vaadin/router";
 import { defaultStyles, buttonStyles } from "../styles/style"
-import "../styles/styles.css";
 
+@customElement("landing-page")
 export class LandingPage extends LitElement {
 
     private handleStartGame() {
-        location.pathname = "login"
+        Router.go("login");
     }
 
     static styles = [

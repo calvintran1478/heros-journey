@@ -1,6 +1,8 @@
 import { html } from "lit";
+import { customElement } from "lit/decorators.js";
 import { PopupBox } from "./popup-box";
 
+@customElement("notification-box")
 export class NotificationBox extends PopupBox {
 
     static styles = super.styles;
