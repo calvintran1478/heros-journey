@@ -232,7 +232,8 @@ func ChangeUserPassword(c *gin.Context) {
 	}
 
 	// Update user password
-	if err = db.Model(&user).Update("password", input.Password).Error; err != nil {
+	user.Password = input.Password
+	if err = db.Save(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
