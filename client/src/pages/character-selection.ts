@@ -38,7 +38,7 @@ export class CharacterSelection extends ProtectedPage {
             if (response.status === 200) {
                 const characters = Array(5).fill(null)
                 for (const character of response.data.characters) {
-                    characters[character.slot_number] = character;
+                    characters[character.slot_number - 1] = character;
                 }
 
                 // Store character information in each selection slot
@@ -136,7 +136,7 @@ export class CharacterSelection extends ProtectedPage {
                 if (selection_slot.character === null) {
                     this._confirmation_box.display("Create new character?", undefined, () => {
                         Router.go("character-creation");
-                        sessionStorage.setItem("slot_number", index.toString());
+                        sessionStorage.setItem("slot_number", (index + 1).toString());
                     })
                 }
 
