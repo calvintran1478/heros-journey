@@ -1,9 +1,10 @@
 import {LitElement, html, css} from 'lit';
-import { state, property } from 'lit/decorators.js';
+import { customElement, state, property } from 'lit/decorators.js';
 import left_selector from '../assets/images/components/left_selector.png'
 import right_selector from '../assets/images/components/right_selector.png'
 import { defaultStyles } from '../styles/style';
 
+@customElement("iterable-selector")
 export class IterableSelector<T> extends LitElement {
     @state()
     private index: number = 0;
@@ -45,7 +46,6 @@ export class IterableSelector<T> extends LitElement {
         button {
             border: 0;
             background: transparent;
-            cursor: pointer;
         }
 
         button:hover {
@@ -59,11 +59,11 @@ export class IterableSelector<T> extends LitElement {
 
     render() {
         return html`
-            <div style="display: flex; flex-direction: row;">
+            <div style="flex-direction: row">
                 <button @click="${this.prev}">
                     <img src=${left_selector} />
                 </button>
-                <input type="textBox" disabled value=${this.options[this.index]} />
+                <input disabled value=${this.options[this.index] as string} />
                 <button @click="${this.next}">
                     <img src=${right_selector} />
                 </button>

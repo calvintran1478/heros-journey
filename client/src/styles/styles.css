@@ -1,5 +1,7 @@
 /* Variables */
 :root {
+    --light-blue: #c6e1ff;
+    --ocean-blue: #84addf;
     --steel-blue: #3b6593;
     --light-green: #b0eda0;
     --dark-gray: #cacaca;
@@ -12,6 +14,10 @@ html {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
+}
+
+.landing-page {
+    background-image: url("../assets/images/backgrounds/landing_page_background.avif");
 }
 
 .character-creation {

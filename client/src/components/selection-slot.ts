@@ -1,7 +1,9 @@
 import { LitElement, html, css } from "lit";
-import { property } from "lit/decorators.js";
+import { customElement, property } from "lit/decorators.js";
 import { CharacterDisplay } from "./character-display";
+import "./character-display"
 
+@customElement("selection-slot")
 export class SelectionSlot extends LitElement {
 
     @property()
@@ -9,7 +11,7 @@ export class SelectionSlot extends LitElement {
 
     @property()
     public selected: boolean = false;
-    
+
     public click_action: () => void = function() { return; };
 
     static styles = css`
@@ -35,7 +37,7 @@ export class SelectionSlot extends LitElement {
             <div>
                 ${this.character}
                 <button style="background-color: ${this.selected ? "var(--selection-highlight)" : "white"}" class="ellipse" type="button" @click=${this.click_action}></button>
-            <div>
+            </div>
         `;
     }
 }

@@ -1,14 +1,17 @@
-import { LitElement, html, css } from "lit"
-import { state, query, queryAll } from 'lit/decorators.js';
+import { html, css, nothing } from "lit"
+import { customElement, state, query, queryAll } from 'lit/decorators.js';
+import { Router } from "@vaadin/router";
 import { ConfirmationBox } from "../components/confirmation-box";
 import { SelectionSlot } from "../components/selection-slot";
 import { CharacterDisplay } from "../components/character-display";
 import { defaultStyles, buttonStyles } from "../styles/style";
+import { ProtectedPage } from "./protected-page";
 import axios from "axios";
+import "../components/confirmation-box"
+import "../components/selection-slot"
 
-export class CharacterSelection extends LitElement {
-
-    private readonly token = ""
+@customElement("character-selection")
+export class CharacterSelection extends ProtectedPage {
 
     // Positional offsets of slots from horizontal center and bottom of the page
     private readonly slot_positions: [string, string][] = [
@@ -16,7 +19,7 @@ export class CharacterSelection extends LitElement {
         ["-45em", "20%"], ["0", "20%"], ["45em", "20%"]     // Front row
     ];
 
-    @query("confirmation-box")
+    @query("confirmation-box", true)
     private _confirmation_box!: ConfirmationBox;
 
     @state()
@@ -25,8 +28,7 @@ export class CharacterSelection extends LitElement {
     @queryAll("selection-slot")
     private _slots!: NodeListOf<SelectionSlot>;
 
-    protected firstUpdated() {
-        // Get user characters
+    private async getCharacters() {
         axios.get("http://localhost:8080/api/v1/users/characters", {
             headers: {
                 Authorization: `Bearer ${this.token}`
@@ -36,7 +38,7 @@ export class CharacterSelection extends LitElement {
             if (response.status === 200) {
                 const characters = Array(5).fill(null)
                 for (const character of response.data.characters) {
-                    characters[character.slot_number] = character;
+                    characters[character.slot_number - 1] = character;
                 }
 
                 // Store character information in each selection slot
@@ -54,18 +56,88 @@ export class CharacterSelection extends LitElement {
                 }
             }
         })
+        .catch(async error => {
+            if (error.response.status === 401) {
+                await this.refreshToken();
+                return await this.getCharacters();
+            }
+        })
+    }
 
-        // Define actions for when selection slots are clicked
+    private async getCharacterStats(selection_slot: SelectionSlot) {
+        axios.get(`http://localhost:8080/api/v1/users/characters/${selection_slot.character!.character_name}`, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+        })
+        .then(response => {
+            if (response.status === 200) {
+                const character: CharacterDisplay = selection_slot.character!;
+                character.level = response.data.level;
+                character.experience = response.data.experience;
+                character.gold = response.data.gold;
+                character.max_health = response.data.max_health;
+                character.health = response.data.health;
+                character.max_mana = response.data.max_mana;
+                character.mana = response.data.mana;
+                character.attack = response.data.attack;
+                character.defense = response.data.defense;
+                character.intelligence = response.data.intelligence;
+                character.speed = response.data.speed;
+                character.luck = response.data.luck;
+                character.dexterity = response.data.dexterity;
+                character.ability_points = response.data.ability_points;
+                character.skill_points = response.data.skill_points;
+                character.sword_proficiency = response.data.sword_proficiency;
+                character.axe_proficiency = response.data.axe_proficiency;
+                character.spear_proficiency = response.data.spear_proficiency;
+                character.dagger_proficiency = response.data.dagger_proficiency;
+                character.staff_proficiency = response.data.staff_proficiency;
+                character.bow_proficiency = response.data.bow_proficiency;
+
+                // Select new character slot
+                this._selected_character_slot = selection_slot;
+                this._selected_character_slot.selected = true;
+            }
+        })
+        .catch(async error => {
+            if (error.response.status === 401) {
+                await this.refreshToken();
+                return await this.getCharacterStats(selection_slot);
+            }
+        })
+    }
+
+    private async deleteCharacter() {
+        axios.delete(`http://localhost:8080/api/v1/users/characters/${this._selected_character_slot!.character!.character_name}`, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+        })
+        .then(response => {
+            if (response.status === 204) {
+                this._selected_character_slot!.character = null;
+                this._selected_character_slot!.selected = false;
+                this._selected_character_slot = null;
+            }
+        })
+        .catch(async error => {
+            if (error.response.status === 401) {
+                await this.refreshToken();
+                await this.deleteCharacter();
+            }
+        })
+    }
+
+    private setupSlots() {
         for (const [index, selection_slot] of this._slots.entries()) {
-            selection_slot.click_action = () => {
+            selection_slot.click_action = async () => {
                 // Prompt user to create a new character
                 if (selection_slot.character === null) {
-                    this._confirmation_box.message = "Create new character?";
-                    this._confirmation_box.action = () => {
-                        location.pathname = "character-creation";
-                        sessionStorage.setItem("slot_number", index.toString());
-                    }
-                    this._confirmation_box.display = true;
+                    this._confirmation_box.display("Create new character?", undefined, () => {
+                        Router.go("character-creation");
+                        sessionStorage.setItem("slot_number", (index + 1).toString());
+                    })
                 }
 
                 // Select character and display stats
@@ -77,41 +149,7 @@ export class CharacterSelection extends LitElement {
 
                     // Make GET request for character stats (if necessary)
                     if (selection_slot.character!.level === 0) {
-                        axios.get(`http://localhost:8080/api/v1/users/characters/${selection_slot.character!.character_name}`, {
-                            headers: {
-                                Authorization: `Bearer ${this.token}`
-                            }
-                        })
-                        .then(response => {
-                            if (response.status === 200) {
-                                const character: CharacterDisplay = selection_slot.character!;
-                                character.level = response.data.level;
-                                character.experience = response.data.experience;
-                                character.gold = response.data.gold;
-                                character.max_health = response.data.max_health;
-                                character.health = response.data.health;
-                                character.max_mana = response.data.max_mana;
-                                character.mana = response.data.mana;
-                                character.attack = response.data.attack;
-                                character.defense = response.data.defense;
-                                character.intelligence = response.data.intelligence;
-                                character.speed = response.data.speed;
-                                character.luck = response.data.luck;
-                                character.dexterity = response.data.dexterity;
-                                character.ability_points = response.data.ability_points;
-                                character.skill_points = response.data.skill_points;
-                                character.sword_proficiency = response.data.sword_proficiency;
-                                character.axe_proficiency = response.data.axe_proficiency;
-                                character.spear_proficiency = response.data.spear_proficiency;
-                                character.dagger_proficiency = response.data.dagger_proficiency;
-                                character.staff_proficiency = response.data.staff_proficiency;
-                                character.bow_proficiency = response.data.bow_proficiency;
-
-                                // Select new character slot
-                                this._selected_character_slot = selection_slot;
-                                this._selected_character_slot.selected = true;
-                            }
-                        })
+                        await this.getCharacterStats(selection_slot);
                     } else {
                         // Select new character slot
                         this._selected_character_slot = selection_slot;
@@ -128,30 +166,28 @@ export class CharacterSelection extends LitElement {
         }
     }
 
+    protected async firstUpdated() {
+        // Define slot click actions
+        this.setupSlots();
+
+        // Get JWT
+        await super.firstUpdated();
+
+        // Get user characters
+        await this.getCharacters();
+    }
+
     private handleDelete() {
-        this._confirmation_box.message = "Are you sure?";
-        this._confirmation_box.action = () => {
+        this._confirmation_box.display("Are you sure?", undefined, () => {
             if (this._selected_character_slot !== null) {
-                axios.delete(`http://localhost:8080/api/v1/users/characters/${this._selected_character_slot.character!.character_name}`, {
-                    headers: {
-                        Authorization: `Bearer ${this.token}`
-                    }
-                })
-                .then(response => {
-                    if (response.status === 204) {
-                        this._selected_character_slot!.character = null;
-                        this._selected_character_slot!.selected = false;
-                        this._selected_character_slot = null;
-                    }
-                })
+                this.deleteCharacter()
             }
-        }
-        this._confirmation_box.display = true;
+        });
     }
 
     private handleEnter() {
         sessionStorage.setItem("character_name", this._selected_character_slot!.character!.character_name);
-        location.pathname = "world";
+        Router.go("world");
     }
 
     static styles = [
@@ -182,7 +218,6 @@ export class CharacterSelection extends LitElement {
             position: fixed;
             top: 22%;
             right: 2.5em;
-            flex-direction: column;
             align-items: center;
         }
 
@@ -193,8 +228,6 @@ export class CharacterSelection extends LitElement {
         }
 
         div {
-            display: flex;
-            flex-direction: column;
             align-items: center;
         }
 
@@ -206,7 +239,7 @@ export class CharacterSelection extends LitElement {
             width: 8.5em;
         }
 
-        p {
+        label {
             margin: 0.75em;
         }
 
@@ -217,7 +250,6 @@ export class CharacterSelection extends LitElement {
         button {
             width: 8em;
             height: 4em;
-            font-weight: bold;
         }
     `];
 
@@ -225,41 +257,42 @@ export class CharacterSelection extends LitElement {
         return html`
             <div>
                 <h1 class="title">Character Selection</h1>
-            </div>
-            <div>
                 ${this.slot_positions.map((pos) =>
                     html`<selection-slot style="margin-left: ${pos[0]}; bottom: ${pos[1]}"></selection-slot>`
                 )}
-            </div>
-            <form style="display: ${this._selected_character_slot ? "flex": "none"}" class="stat-box">
-                <h2>Character Name</h2>
-                <input type="textBox" class="character-name" disabled value=${this._selected_character_slot ? this._selected_character_slot.character!.character_name : ""}>
-                <div style="flex-direction: row">
-                    <div>
-                        <p>Level:</p>
-                        <p>Attack:</p>
-                        <p>Defense:</p>
-                        <p>Intelligence:</p>
-                        <p>Speed:</p>
-                        <p>Luck:</p>
-                        <p>Dexterity:</p>
-                    </div>
-                    <div>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.level : 0} disabled>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.attack : 0} disabled>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.defense : 0} disabled>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.intelligence : 0} disabled>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.speed : 0} disabled>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.luck : 0} disabled>
-                        <input value=${this._selected_character_slot ? this._selected_character_slot.character!.dexterity : 0} disabled>
-                    </div>
-                </div>
-                <button style="background-color: var(--light-red)" type="button" @click=${this.handleDelete}>Delete</button>
-            </form>
-            <confirmation-box></confirmation-box>
-            <div>
+                ${this._selected_character_slot ? 
+                    html`
+                        <form class="stat-box">
+                            <label for="character-name" style="font-size: 1.5em">Character Name</label>
+                            <input id="character-name" class="character-name" value=${this._selected_character_slot.character!.character_name} disabled>
+                            <div style="flex-direction: row">
+                                <div>
+                                    <label for="level">Level:</label>
+                                    <label for="attack">Attack:</label>
+                                    <label for="defense">Defense:</label>
+                                    <label for="intelligence">Intelligence:</label>
+                                    <label for="speed">Speed:</label>
+                                    <label for="luck">Luck:</label>
+                                    <label for="dexterity">Dexterity:</label>
+                                </div>
+                                <div>
+                                    <input id="level" value=${this._selected_character_slot.character!.level} disabled>
+                                    <input id="attck" value=${this._selected_character_slot.character!.attack} disabled>
+                                    <input id="defense" value=${this._selected_character_slot.character!.defense} disabled>
+                                    <input id="intelligence" value=${this._selected_character_slot.character!.intelligence} disabled>
+                                    <input id="speed" value=${this._selected_character_slot.character!.speed} disabled>
+                                    <input id="luck" value=${this._selected_character_slot.character!.luck} disabled>
+                                    <input id="dexterity" value=${this._selected_character_slot.character!.dexterity} disabled>
+                                </div>
+                            </div>
+                            <button style="background-color: var(--light-red)" type="button" @click=${this.handleDelete}>Delete</button>
+                        </form>
+                    ` : nothing
+                }
                 <button class="enter" ?disabled=${this._selected_character_slot === null} @click=${this.handleEnter}>Enter</button>
             </div>
+            <confirmation-box></confirmation-box>
+            ${this.notification_template}
         `
     }
 }
