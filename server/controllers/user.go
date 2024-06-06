@@ -2,13 +2,14 @@ package controllers
 
 import (
 	"heros-journey/server/models"
-	"strings"
+	"heros-journey/server/utils"
+	"os"
+	"strconv"
 	"net/http"
 	"net/mail"
 	"gorm.io/gorm"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"heros-journey/server/utils"
 )
 
 // POST /api/v1/users
@@ -91,7 +92,13 @@ func LoginUser(c *gin.Context) {
 	}
 
 	// Add httponly cookie to response, which contains the refresh token
-	c.SetCookie("refresh-token", refreshToken, -1, "/", "localhost", false, true)
+	tokenLifespan, err := strconv.Atoi(os.Getenv("REFRESH_TOKEN_HOUR_LIFESPAN"))
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.SetSameSite(http.SameSiteStrictMode)
+	c.SetCookie("refresh-token", refreshToken, tokenLifespan * 3600, "/", "localhost", false, true)
 
 	c.JSON(http.StatusOK, gin.H{"token": accessToken})
 }
@@ -184,16 +191,7 @@ func SendResetPasswordEmail(c *gin.Context) {
 	}
 
 	// Send email to reset password
-	subject := "Reset Password"
-
-	var body strings.Builder
-	body.WriteString("Hi, we have received a request to reset your password for your Hero's Journey account.")
-	body.WriteString(" To change your password please click on the link below.\n\n")
-	body.WriteString(token)	// Will later pass token through a verification link
-	body.WriteString("\n\nIf this was not you kindly ignore this message.\n\n")
-	body.WriteString("Regards,\nThe Hero's Journey Team")
-
-	if err = utils.SendEmail(input.Email, subject, body.String()); err != nil {
+	if err = utils.SendResetPasswordEmail(input.Email, token); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -234,10 +232,11 @@ func ChangeUserPassword(c *gin.Context) {
 	}
 
 	// Update user password
-	if err = db.Model(&user).Update("password", input.Password).Error; err != nil {
+	user.Password = input.Password
+	if err = db.Save(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.Status(http.StatusNoContent)
 }

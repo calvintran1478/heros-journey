@@ -15,6 +15,9 @@ func main() {
 	router := gin.Default()
 	router.Use(middleware.DatabaseMiddleware(db))
 
+	// Set up CORS middleware
+	router.Use(middleware.CORSMiddleware())
+
 	// Create routing groups
 	v1 := router.Group("/api/v1")
 	routes.AddUserRoutes(v1)

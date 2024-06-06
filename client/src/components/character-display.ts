@@ -1,6 +1,7 @@
 import { LitElement, html, css } from "lit";
-import { property } from "lit/decorators.js";
+import { customElement, property } from "lit/decorators.js";
 
+@customElement("character-display")
 export class CharacterDisplay extends LitElement {
 
     @property()
