@@ -45,6 +45,9 @@ export class CharacterDisplay extends LitElement {
     staff_proficiency: number = 0;
     bow_proficiency: number = 0;
 
+    // Declare index signature
+    [key: string]: any
+
     constructor(character_name: string, gender: string, hair_colour: string, skin_colour: string, eye_colour: string, width: number = 25) {
         super();
         this.character_name = character_name;

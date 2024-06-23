@@ -59,7 +59,15 @@ export const routes: Route[] = [
                 component: 'character-selection',
                 action: async () => {
                     await import('../pages/character-selection');
-                    htmlElement!.className = "character-selection"
+                    htmlElement!.className = "character-selection";
+                }
+            },
+            {
+                path: 'world',
+                component: 'game-world',
+                action: async () => {
+                    await import('../pages/game-world');
+                    htmlElement!.className = "";
                 }
             }
         ]

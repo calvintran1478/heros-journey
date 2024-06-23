@@ -72,28 +72,11 @@ export class CharacterSelection extends ProtectedPage {
         })
         .then(response => {
             if (response.status === 200) {
+                // Store character stats
                 const character: CharacterDisplay = selection_slot.character!;
-                character.level = response.data.level;
-                character.experience = response.data.experience;
-                character.gold = response.data.gold;
-                character.max_health = response.data.max_health;
-                character.health = response.data.health;
-                character.max_mana = response.data.max_mana;
-                character.mana = response.data.mana;
-                character.attack = response.data.attack;
-                character.defense = response.data.defense;
-                character.intelligence = response.data.intelligence;
-                character.speed = response.data.speed;
-                character.luck = response.data.luck;
-                character.dexterity = response.data.dexterity;
-                character.ability_points = response.data.ability_points;
-                character.skill_points = response.data.skill_points;
-                character.sword_proficiency = response.data.sword_proficiency;
-                character.axe_proficiency = response.data.axe_proficiency;
-                character.spear_proficiency = response.data.spear_proficiency;
-                character.dagger_proficiency = response.data.dagger_proficiency;
-                character.staff_proficiency = response.data.staff_proficiency;
-                character.bow_proficiency = response.data.bow_proficiency;
+                for (const key in response.data) {
+                    character[key] = response.data[key]
+                }
 
                 // Select new character slot
                 this._selected_character_slot = selection_slot;
