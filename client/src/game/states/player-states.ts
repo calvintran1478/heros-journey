@@ -25,14 +25,14 @@ export abstract class State {
 
 export abstract class Wandering extends State {
 
-    handleUpdate(input: string[]): void {
+    handleUpdate(input: string[], deltaTime: number): void {
         // Update position
-        this.character.x += this.character.vx;
-        this.character.y += this.character.vy;
+        this.character.x += this.character.vx * deltaTime;
+        this.character.y += this.character.vy * deltaTime;
 
         // Update speed
         this.character.vx = 0;
-            this.character.vy = 0;
+        this.character.vy = 0;
 
         if (input.includes("ArrowLeft")) {
             this.character.orientation = "left";

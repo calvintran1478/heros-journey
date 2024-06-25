@@ -19,7 +19,7 @@ export class Character {
     orientation: "left" | "right" = "right";
     width: number = 250;
     height: number = 250;
-    walkingSpeed: number = 2;
+    walkingSpeed: number = 128;
     x: number = 0;
     y: number = 0;
     vx: number = 0;
@@ -35,7 +35,7 @@ export class Character {
 
     // Animation speed
     fps: number = 20;
-    frameInterval: number = 1000/this.fps;
+    frameInterval: number = 1/this.fps;
     frameTimer: number = 0;
 
     // Character stats

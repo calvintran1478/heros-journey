@@ -4,8 +4,31 @@ import { ProtectedPage } from "./protected-page";
 import { Game } from "../game/game";
 import { Character } from "../game/models/character";
 import { InputHandler } from "../game/controller/input";
+import { Map } from "../game/map";
+import { Layer } from "../game/layer";
+import { GAME_WIDTH, GAME_HEIGHT, IMAGE_TILE } from "../game/settings";
 import axios from "axios";
 import soldier from "../assets/sprites/characters/heroes/Soldier.png";
+import grass from "../assets/sprites/world/TX Tileset Grass.png";
+
+const LEVEL1: number[] = [
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+];
 
 @customElement("game-world")
 export class GameWorld extends ProtectedPage {
@@ -21,11 +44,13 @@ export class GameWorld extends ProtectedPage {
 
     private animateFrame = (timeStamp: number) => {
         // Compute delta time
-        const deltaTime = timeStamp - this.lastTime;
+        const deltaTime = (timeStamp - this.lastTime) / 1000;
         this.lastTime = timeStamp;
 
-        // Draw frame
+        // Clear previous screen
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw new game screen
         this.game.update(deltaTime);
         this.game.draw(this.ctx);
 
@@ -74,15 +99,23 @@ export class GameWorld extends ProtectedPage {
         await super.firstUpdated();
 
         // Set up canvas
-        this.canvas.width = 1250;
-        this.canvas.height = 750;
+        this.canvas.width = GAME_WIDTH;
+        this.canvas.height = GAME_HEIGHT;
 
         // Set up context
         this.ctx = this.canvas.getContext("2d")!;
+        this.ctx.imageSmoothingEnabled = false;
+
+        // Load game assets
+        const playerImage = this.renderRoot.querySelector("#soldier") as HTMLImageElement;
+        const grassImage = this.renderRoot.querySelector("#grass") as HTMLImageElement;
+
+        // Create map
+        const layer1 = new Layer(grassImage, IMAGE_TILE, LEVEL1);
+        const map = new Map([layer1]);
 
         // Set up game
-        const playerImage = this.renderRoot.querySelector("#soldier") as HTMLImageElement;
-        this.game = new Game(this.canvas.width, this.canvas.height, this.inputHandler, playerImage);
+        this.game = new Game(this.canvas.width, this.canvas.height, this.inputHandler, map, playerImage);
         await this.initializeCharacter(this.game.player);
 
         // Start game animation cycle
@@ -98,6 +131,8 @@ export class GameWorld extends ProtectedPage {
             transform: translate(-50%, -50%);
             max-width: 100%;
             max-height: 100%;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
         }
 
         img {
@@ -109,6 +144,7 @@ export class GameWorld extends ProtectedPage {
         return html`
             <canvas></canvas>
             <img id="soldier" src=${soldier} />
+            <img id="grass" src=${grass} />
         `
     }
 }

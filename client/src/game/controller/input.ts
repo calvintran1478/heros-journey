@@ -5,7 +5,7 @@ export class InputHandler {
 
     private handleKeyDown = (event: KeyboardEvent) => {
         if (this.possible_player_inputs.includes(event.key) && !this.keys.includes(event.key)) {
-            this.keys.push(event.key);
+            this.keys.unshift(event.key);
         }
     }
 
