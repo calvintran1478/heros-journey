@@ -16,6 +16,10 @@ html {
     background-size: cover;
 }
 
+img {
+    display: none;
+}
+
 .landing-page {
     background-image: url("../assets/images/backgrounds/landing_page_background.avif");
 }

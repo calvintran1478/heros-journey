@@ -4,31 +4,9 @@ import { ProtectedPage } from "./protected-page";
 import { Game } from "../game/game";
 import { Character } from "../game/models/character";
 import { InputHandler } from "../game/controller/input";
-import { Map } from "../game/map";
-import { Layer } from "../game/layer";
-import { GAME_WIDTH, GAME_HEIGHT, IMAGE_TILE } from "../game/settings";
+import { GAME_WIDTH, GAME_HEIGHT } from "../game/settings";
+import { starter_map } from "../game/maps/starter-map";
 import axios from "axios";
-import soldier from "../assets/sprites/characters/heroes/Soldier.png";
-import grass from "../assets/sprites/world/TX Tileset Grass.png";
-
-const LEVEL1: number[] = [
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-];
 
 @customElement("game-world")
 export class GameWorld extends ProtectedPage {
@@ -106,16 +84,8 @@ export class GameWorld extends ProtectedPage {
         this.ctx = this.canvas.getContext("2d")!;
         this.ctx.imageSmoothingEnabled = false;
 
-        // Load game assets
-        const playerImage = this.renderRoot.querySelector("#soldier") as HTMLImageElement;
-        const grassImage = this.renderRoot.querySelector("#grass") as HTMLImageElement;
-
-        // Create map
-        const layer1 = new Layer(grassImage, IMAGE_TILE, LEVEL1);
-        const map = new Map([layer1]);
-
         // Set up game
-        this.game = new Game(this.canvas.width, this.canvas.height, this.inputHandler, map, playerImage);
+        this.game = new Game(this.canvas.width, this.canvas.height, this.inputHandler, starter_map);
         await this.initializeCharacter(this.game.player);
 
         // Start game animation cycle
@@ -143,8 +113,6 @@ export class GameWorld extends ProtectedPage {
     render() {
         return html`
             <canvas></canvas>
-            <img id="soldier" src=${soldier} />
-            <img id="grass" src=${grass} />
         `
     }
 }

@@ -9,10 +9,10 @@ export class Game {
     inputHandler: InputHandler;
     map: Map;
 
-    constructor(width: number, height: number, inputHandler: InputHandler, map: Map, playerImage: HTMLImageElement) {
+    constructor(width: number, height: number, inputHandler: InputHandler, map: Map) {
         this.width = width;
         this.height = height;
-        this.player = new Character(this, playerImage);
+        this.player = new Character(this, document.getElementById("soldier") as HTMLImageElement);
         this.inputHandler = inputHandler;
         this.map = map;
     }
