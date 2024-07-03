@@ -1,8 +1,15 @@
 import { Character } from "../models/character";
+import { GAME_TILE, GAME_COLUMNS, GAME_ROWS } from "../settings";
 
-enum StateEnum {
-    IDLE,
-    WALKING
+export enum StateEnum {
+    IDLE_LEFT,
+    IDLE_RIGHT,
+    IDLE_UP,
+    IDLE_DOWN,
+    WALKING_LEFT,
+    WALKING_RIGHT,
+    WALKING_UP,
+    WALKING_DOWN
 }
 
 export abstract class State {
@@ -15,63 +22,151 @@ export abstract class State {
     }
 
     enter() {
-        this.character.frameX = 0;
-        this.character.frameY = this.frameY;
+        this.character.sprite.frameX = 0;
+        this.character.sprite.frameY = this.frameY;
     }
 
-    abstract handleState(input: string[]): void;
-    abstract handleUpdate(input: string[], deltaTime: number): void;
+    abstract handleState(lastKey: string): void;
+    abstract handleUpdate(lastKey: string, deltaTime: number): void;
 }
 
 export abstract class Wandering extends State {
 
-    handleUpdate(input: string[], deltaTime: number): void {
-        // Update position
-        this.character.x += this.character.vx * deltaTime;
-        this.character.y += this.character.vy * deltaTime;
+    handleUpdate(lastKey: string, deltaTime: number): void {
+        // Move character towards intended destination
+        const movementDistance = this.character.walkingSpeed * deltaTime;
+        this.character.moveTowards(this.character.destinationX, this.character.destinationY, movementDistance)
 
-        // Update speed
-        this.character.vx = 0;
-        this.character.vy = 0;
+        // Determine new destination based on player input
+        let nextX = this.character.destinationX;
+        let nextY = this.character.destinationY;
+        if (this.character.arrived) {
+            switch(lastKey) {
+                case "ArrowLeft":
+                    nextX -= GAME_TILE;
+                    break;
+                case "ArrowRight":
+                    nextX += GAME_TILE;
+                    break;
+                case "ArrowUp":
+                    nextY -= GAME_TILE;
+                    break;
+                case "ArrowDown":
+                    nextY += GAME_TILE;
+                    break;
+            }
 
-        if (input.includes("ArrowLeft")) {
-            this.character.orientation = "left";
-            this.character.vx = -this.character.walkingSpeed;
-        } else if (input.includes("ArrowRight")) {
-            this.character.orientation = "right";
-            this.character.vx = this.character.walkingSpeed;
-        } else if (input.includes("ArrowUp")) {
-            this.character.vy = -this.character.walkingSpeed;
-        } else if (input.includes("ArrowDown")) {
-            this.character.vy = this.character.walkingSpeed;
+            // Check if new destination is valid
+            const nextCol = nextX / GAME_TILE;
+            const nextRow = nextY / GAME_TILE;
+            const withinGameScreen = (0 <= nextCol && nextCol < GAME_COLUMNS) && (0 <= nextRow && nextRow < GAME_ROWS);
+            const noCollision = (this.character.game.map.collision_map[nextRow * GAME_COLUMNS + nextCol] !== 1)
+            if (withinGameScreen && noCollision) {
+                this.character.destinationX = nextX;
+                this.character.destinationY = nextY;
+            }
         }
+    }
 
-        // Stop player from moving outside of the game
-        if (this.character.x < 0) this.character.x = 0;
-        if (this.character.x > this.character.game.width - this.character.width) this.character.x = this.character.game.width - this.character.width;
-        if (this.character.y < 0) this.character.y = 0;
-        if (this.character.y > this.character.game.height - this.character.height) this.character.y = this.character.game.height - this.character.height;
+    handleState(lastKey: string): void {
+        if (this.character.x === this.character.destinationX && this.character.y === this.character.destinationY) {
+            switch (lastKey) {
+                case "ArrowLeft":
+                    this.character.setState(StateEnum.IDLE_LEFT);
+                    break;
+                case "ArrowRight":
+                    this.character.setState(StateEnum.IDLE_RIGHT);
+                    break;
+                case "ArrowUp":
+                    this.character.setState(StateEnum.IDLE_UP);
+                    break;
+                case "ArrowDown":
+                    this.character.setState(StateEnum.IDLE_DOWN);
+                    break;
+            }
+        } else if (this.character.arrived) {
+            switch (lastKey) {
+                case "ArrowLeft":
+                    this.character.setState(StateEnum.WALKING_LEFT);
+                    break;
+                case "ArrowRight":
+                    this.character.setState(StateEnum.WALKING_RIGHT);
+                    break;
+                case "ArrowUp":
+                    this.character.setState(StateEnum.WALKING_UP);
+                    break;
+                case "ArrowDown":
+                    this.character.setState(StateEnum.WALKING_DOWN);
+                    break;
+            }
+        }
     }
 }
 
-export class Idle extends Wandering {
-    protected readonly frameY: number = 0;
-    public readonly numFrames: number = 6;
+export abstract class Idle extends Wandering {
+    public readonly numFrames: number = 1;
+}
 
-    handleState(input: string[]): void {
-        if (input.includes("ArrowLeft") || input.includes("ArrowRight") || input.includes("ArrowUp") || input.includes("ArrowDown")) {
-            this.character.setState(StateEnum.WALKING);
+export class IdleLeft extends Idle {
+    protected frameY: number = 9;
+}
+
+export class IdleRight extends Idle {
+    protected frameY: number = 11;
+}
+
+export class IdleUp extends Idle {
+    protected frameY: number = 8;
+}
+
+export class IdleDown extends Idle {
+    protected frameY: number = 10;
+}
+
+export abstract class Walking extends Wandering {
+    public readonly numFrames: number = 9;
+}
+
+export class WalkingLeft extends Walking {
+    protected readonly frameY: number = 9;
+
+    handleState(lastKey: string): void {
+        super.handleState(lastKey);
+        if (this.character.arrived && lastKey === "") {
+            this.character.setState(StateEnum.IDLE_LEFT);
         }
     }
 }
 
-export class Walking extends Wandering {
-    protected readonly frameY: number = 1;
-    public readonly numFrames: number = 8;
+export class WalkingRight extends Walking {
+    protected readonly frameY: number = 11;
 
-    handleState(input: string[]): void {
-        if (input.length === 0) {
-            this.character.setState(StateEnum.IDLE);
+    handleState(lastKey: string): void {
+        super.handleState(lastKey);
+        if (this.character.arrived && lastKey === "") {
+            this.character.setState(StateEnum.IDLE_RIGHT);
+        }
+    }
+}
+
+export class WalkingUp extends Walking {
+    protected readonly frameY: number = 8;
+
+    handleState(lastKey: string): void {
+        super.handleState(lastKey);
+        if (this.character.arrived && lastKey === "") {
+            this.character.setState(StateEnum.IDLE_UP);
+        }
+    }
+}
+
+export class WalkingDown extends Walking {
+    protected readonly frameY: number = 10;
+
+    handleState(lastKey: string): void {
+        super.handleState(lastKey);
+        if (this.character.arrived && lastKey === "") {
+            this.character.setState(StateEnum.IDLE_DOWN);
         }
     }
 }

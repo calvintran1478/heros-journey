@@ -25,10 +25,7 @@ export class GameWorld extends ProtectedPage {
         const deltaTime = (timeStamp - this.lastTime) / 1000;
         this.lastTime = timeStamp;
 
-        // Clear previous screen
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Draw new game screen
+        // Update game screen
         this.game.update(deltaTime);
         this.game.draw(this.ctx);
 
@@ -103,10 +100,6 @@ export class GameWorld extends ProtectedPage {
             max-height: 100%;
             image-rendering: crisp-edges;
             image-rendering: pixelated;
-        }
-
-        img {
-            display: none
         }
     `
 

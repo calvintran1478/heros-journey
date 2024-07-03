@@ -27,4 +27,12 @@ export class InputHandler {
         window.removeEventListener("keydown", this.handleKeyDown);
         window.removeEventListener("keyup", this.handleKeyUp);
     }
+
+    get lastKey() {
+        if (this.keys.length > 0) {
+            return this.keys[0];
+        } else {
+            return "";
+        }
+    }
 }

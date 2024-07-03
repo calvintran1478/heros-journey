@@ -5,9 +5,11 @@ export class Map {
     width: number = GAME_WIDTH;
     height: number = GAME_HEIGHT;
     layers: Layer[];
+    collision_map: number[];
 
-    constructor(layers: Layer[]) {
+    constructor(layers: Layer[], collision_map: number[]) {
         this.layers = layers;
+        this.collision_map = collision_map;
     }
 
     draw(context: CanvasRenderingContext2D) {

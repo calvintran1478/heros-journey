@@ -1,37 +1,22 @@
 import { Game } from "../game";
-import { State, Idle, Walking } from "../states/player-states";
+import { State, IdleLeft, IdleRight, IdleUp, IdleDown, WalkingLeft, WalkingRight, WalkingUp, WalkingDown } from "../states/player-states";
+import { GameObject } from "../game-object";
+import { Sprite } from "../sprite";
+import { StateEnum } from "../states/player-states";
 
-const frameWidth: number = 100;
-const frameHeight: number = 100;
-
-export class Character {
+export class Character extends GameObject {
     // Display attributes
     name: string = "";
     gender: string = "";
     hair_colour: string = "";
     eye_colour: string = "";
 
-    // Game instance character belongs to
-    game: Game;
-
-    // Display values
-    image: HTMLImageElement;
-    orientation: "left" | "right" = "right";
-    width: number = 250;
-    height: number = 250;
+    // Movement speed
     walkingSpeed: number = 128;
-    x: number = 0;
-    y: number = 0;
-    vx: number = 0;
-    vy: number = 0;
 
     // States
     states: State[];
     currentState: State;
-
-    // Sprite frame
-    frameX: number = 0;
-    frameY: number = 0;
 
     // Animation speed
     fps: number = 20;
@@ -64,36 +49,25 @@ export class Character {
     // Declare index signature
     [key: string]: any
 
-    constructor(game: Game, playerImage: HTMLImageElement) {
-        this.game = game;
-        this.image = playerImage;
-        this.states = [new Idle(this), new Walking(this)];
-        this.currentState = this.states[0];
+    constructor(game: Game, sprite: Sprite, x?: number, y?: number, scale?: number) {
+        super(game, sprite, x, y, scale);
+        this.states = [new IdleLeft(this), new IdleRight(this), new IdleUp(this), new IdleDown(this), new WalkingLeft(this), new WalkingRight(this), new WalkingUp(this), new WalkingDown(this)];
+        this.currentState = this.states[StateEnum.IDLE_UP];
     }
 
-    update(input: string[], deltaTime: number) {
-        // Change player state based on input
-        this.currentState.handleState(input);
-
+    update(lastKey: string, deltaTime: number) {
         // Update player position
-        this.currentState.handleUpdate(input, deltaTime);
+        this.currentState.handleUpdate(lastKey, deltaTime);
+
+        // Change player state based on input
+        this.currentState.handleState(lastKey);
 
         // Update frame timer and sprite frame
-        if (this.frameTimer > this.frameInterval) {
-            this.frameTimer = 0;
-            this.frameX = (this.frameX + 1) % this.currentState.numFrames;
-        } else {
+        if (this.frameTimer < this.frameInterval) {
             this.frameTimer += deltaTime;
-        }
-    }
-
-    draw(context: CanvasRenderingContext2D) { 
-        if (this.orientation === "left") {
-            context.scale(-1, 1);
-            context.drawImage(this.image, this.frameX * frameWidth, this.frameY * frameHeight, frameWidth, frameHeight, -this.x - this.width, this.y, this.width, this.height);
-            context.scale(-1, 1);
-        } else if (this.orientation === "right") {
-            context.drawImage(this.image, this.frameX * frameWidth, this.frameY * frameHeight, frameWidth, frameHeight, this.x, this.y, this.width, this.height);
+        } else {
+            this.frameTimer %= this.frameInterval;
+            this.sprite.frameX = (this.sprite.frameX + 1) % this.currentState.numFrames;
         }
     }
 
